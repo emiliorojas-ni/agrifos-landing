@@ -15,6 +15,7 @@ const FieldMark = () => (
 
 const Brand = ({ light = false }: { light?: boolean }) => (
   <a className={`brand ${light ? "brand--light" : ""}`} href="#inicio" aria-label="Ágrifos — inicio">
+    <img className="brand-isotype" src={isotipo} alt="" aria-hidden="true" />
     <img className="brand-logo" src={logotipo} alt="Ágrifos" />
   </a>
 )

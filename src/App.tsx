@@ -20,91 +20,6 @@ const Brand = ({ light = false }: { light?: boolean }) => (
   </a>
 )
 
-const BotanicalDataIllustration = () => (
-  <div
-    className="hero-art"
-    aria-label="Ilustración de un cultivo guiado por datos"
-  >
-    <svg fill="none" viewBox="0 0 610 610" role="img">
-      <title>Planta, parcelas y mediciones agrícolas</title>
-      <path
-        className="art-orbit"
-        d="M487 71c-91-37-230-14-317 78C79 245 71 397 146 492"
-      />
-      <path
-        className="art-orbit art-orbit--small"
-        d="M500 140c48 85 37 207-29 284"
-      />
-
-      <path className="art-field" d="M137 475c77-45 181-66 315-57" />
-      <path className="art-field" d="M157 509c92-38 193-51 303-38" />
-      <path className="art-field" d="M200 540c82-24 167-29 253-15" />
-      <path
-        className="art-field"
-        d="M254 439c-8 32-10 64-5 95M328 423c-3 35-1 69 8 104M397 418c3 32 10 62 22 92"
-      />
-
-      <path className="art-stem" d="M315 436c-4-97 3-190 22-280" />
-      <path
-        className="art-stem"
-        d="M325 332c-44-26-73-61-87-106 51 3 86 28 99 75"
-      />
-      <path
-        className="art-leaf"
-        d="M238 226c51 3 86 28 99 75-44-9-77-34-99-75Z"
-      />
-      <path
-        className="art-stem"
-        d="M332 273c31-42 66-67 105-74-2 45-36 82-109 111"
-      />
-      <path
-        className="art-leaf art-leaf--accent"
-        d="M437 199c-2 45-36 82-109 111 16-58 52-95 109-111Z"
-      />
-      <path
-        className="art-stem"
-        d="M337 216c-25-35-32-72-21-111 41 25 55 62 30 112"
-      />
-      <path
-        className="art-leaf"
-        d="M316 105c41 25 55 62 30 112-25-35-32-72-30-112Z"
-      />
-
-      <circle className="art-node" cx="339" cy="154" r="7" />
-      <circle className="art-node" cx="236" cy="226" r="7" />
-      <circle className="art-node" cx="438" cy="198" r="7" />
-      <path className="art-measure" d="M438 198h74v-54" />
-      <path className="art-measure" d="M236 226h-78v48" />
-
-      <g className="art-label">
-        <rect x="454" y="105" width="91" height="39" />
-        <text x="469" y="130">
-          HUM 72%
-        </text>
-      </g>
-      <g className="art-label">
-        <rect x="89" y="273" width="88" height="39" />
-        <text x="105" y="298">
-          PH 6.4
-        </text>
-      </g>
-
-      <g className="art-sun">
-        <circle cx="470" cy="338" r="35" />
-        <path d="M470 285v-17M470 408v-17M417 338h-17M540 338h-17M432 300l-12-12M520 388l-12-12M508 300l12-12M420 388l12-12" />
-      </g>
-    </svg>
-    <div className="art-note">
-      <span>01</span>
-      <p>
-        Lectura precisa
-        <br />
-        del territorio
-      </p>
-    </div>
-  </div>
-)
-
 const HeroVisual = () => (
   <div className="hero-visual">
     <figure className="hero-photo">
@@ -147,7 +62,6 @@ const HeroVisual = () => (
       </div>
       <span className="phone-tag">Monitoreo en tiempo real</span>
     </div>
-    <BotanicalDataIllustration />
     <div className="hero-reading">
       <span className="reading-pulse" />
       <div>
@@ -606,6 +520,11 @@ export default function App() {
             className={`object-card object-card--sensor ${
               activeObject === 0 ? "is-expanded" : ""
             }`}
+            onClick={(event) => {
+              if (!(event.target as HTMLElement).closest("a, button")) {
+                setActiveObject(activeObject === 0 ? -1 : 0)
+              }
+            }}
           >
             <div className="sensor-scene" aria-hidden="true">
               <span className="sensor-antenna" />
@@ -649,6 +568,11 @@ export default function App() {
 
           <article
             className={`object-card ${activeObject === 1 ? "is-expanded" : ""}`}
+            onClick={(event) => {
+              if (!(event.target as HTMLElement).closest("a, button")) {
+                setActiveObject(activeObject === 1 ? -1 : 1)
+              }
+            }}
           >
             <figure>
               <img
@@ -692,6 +616,11 @@ export default function App() {
 
           <article
             className={`object-card ${activeObject === 2 ? "is-expanded" : ""}`}
+            onClick={(event) => {
+              if (!(event.target as HTMLElement).closest("a, button")) {
+                setActiveObject(activeObject === 2 ? -1 : 2)
+              }
+            }}
           >
             <figure>
               <img
@@ -735,6 +664,11 @@ export default function App() {
 
           <article
             className={`object-card ${activeObject === 3 ? "is-expanded" : ""}`}
+            onClick={(event) => {
+              if (!(event.target as HTMLElement).closest("a, button")) {
+                setActiveObject(activeObject === 3 ? -1 : 3)
+              }
+            }}
           >
             <figure>
               <img

@@ -1,0 +1,12 @@
+{
+  "description": "Showcases Ágrifos' smart agricultural solutions through a professional landing page that blends tradition with technology to inspire trust and sustainability.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  },
+  "title": "Ágrifos — Inteligencia para el campo",
+  "language": "es"
+}

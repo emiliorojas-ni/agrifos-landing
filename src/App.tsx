@@ -1,3 +1,6 @@
+import logotipo from "./assets/agrifos-logotipo.svg"
+import isotipo from "./assets/agrifos-isotipo.svg"
+import panelGeneral from "./assets/panel-general.png"
 import { useEffect, useState, type CSSProperties } from "react"
 
 const ArrowUpRight = ({ className = "" }: { className?: string }) => (
@@ -7,23 +10,12 @@ const ArrowUpRight = ({ className = "" }: { className?: string }) => (
 )
 
 const FieldMark = () => (
-  <svg
-    aria-hidden="true"
-    className="field-mark"
-    fill="none"
-    viewBox="0 0 40 40"
-  >
-    <path d="M7 29c8-1 14-7 15-18 7 4 11 12 7 19" stroke="currentColor" />
-    <path d="M11 31c4-7 10-11 18-12M7 34h26" stroke="currentColor" />
-  </svg>
+  <img className="field-mark" src={isotipo} alt="" aria-hidden="true" />
 )
 
 const Brand = ({ light = false }: { light?: boolean }) => (
-  <a className={`brand ${light ? "brand--light" : ""}`} href="#inicio">
-    <span className="brand-mark">
-      <FieldMark />
-    </span>
-    <span className="brand-name">Ágrifos</span>
+  <a className={`brand ${light ? "brand--light" : ""}`} href="#inicio" aria-label="Ágrifos — inicio">
+    <img className="brand-logo" src={logotipo} alt="Ágrifos" />
   </a>
 )
 
@@ -148,76 +140,8 @@ const HeroVisual = () => (
     <div className="phone" aria-label="Vista previa de la aplicación Ágrifos">
       <div className="phone-frame">
         <div className="phone-speaker" />
-        <div className="phone-screen">
-          <div className="phone-status">
-            <span>09:41</span>
-            <span>Ágrifos</span>
-            <i />
-          </div>
-          <div className="phone-greeting">
-            <div>
-              <small>Buenos días, Marta</small>
-              <strong>Finca El Porvenir</strong>
-            </div>
-            <span>LP</span>
-          </div>
-          <div className="phone-plot">
-            <div className="plot-map" aria-hidden="true">
-              <svg fill="none" viewBox="0 0 180 78">
-                <path d="M7 67C36 43 57 58 79 37s49-6 67-25" />
-                <path d="M9 76C41 51 62 67 86 45s50-8 74-35" />
-                <circle cx="82" cy="39" r="4" />
-              </svg>
-            </div>
-            <div className="plot-heading">
-              <span>Lote 04 · Café</span>
-              <small>Estable</small>
-            </div>
-            <div className="plot-reading">
-              <div className="moisture-ring">
-                <strong>72</strong>
-                <span>%</span>
-              </div>
-              <div>
-                <small>Humedad del suelo</small>
-                <strong>Nivel óptimo</strong>
-                <span>Última lectura · 8 min</span>
-              </div>
-            </div>
-          </div>
-          <div className="phone-recommendation">
-            <span className="recommendation-icon">
-              <svg fill="none" viewBox="0 0 24 24">
-                <path d="M12 21V9m0 7c-4-.7-6.4-2.7-7-6.3 4-.3 6.7 1.7 7 6.3Zm0-3c1.3-4.3 3.7-6.7 7.3-7 .1 4-2.3 6.7-7.3 7Z" />
-              </svg>
-            </span>
-            <div>
-              <small>Recomendación de hoy</small>
-              <strong>Posponer riego 24 horas</strong>
-            </div>
-            <span>›</span>
-          </div>
-          <div className="phone-chart">
-            <span>Últimos 7 días</span>
-            <div>
-              {[48, 62, 54, 76, 68, 86, 72].map((height, index) => (
-                <i
-                  className={index === 6 ? "is-current" : ""}
-                  key={height + index}
-                  style={{ "--bar-height": `${height}%` } as CSSProperties}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="phone-nav" aria-hidden="true">
-            <i />
-            <i />
-            <span>
-              <FieldMark />
-            </span>
-            <i />
-            <i />
-          </div>
+        <div className="phone-screen phone-screen--capture">
+          <img className="phone-interface" src={panelGeneral} alt="Panel General de Ágrifos: condiciones actuales, lluvia prevista y última lectura global del suelo" width="738" height="1600" />
         </div>
       </div>
       <span className="phone-tag">Monitoreo en tiempo real</span>
@@ -685,7 +609,7 @@ export default function App() {
             <div className="sensor-scene" aria-hidden="true">
               <span className="sensor-antenna" />
               <div className="sensor-device">
-                <span className="sensor-brand">Á</span>
+                <span className="sensor-brand"><FieldMark /></span>
                 <div className="sensor-display">
                   <small>Suelo</small>
                   <strong>72%</strong>

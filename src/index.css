@@ -5005,3 +5005,13 @@ footer {
     transition: none;
   }
 }
+
+/* Supplied brand assets and actual app screen. */
+.brand-logo { width: 146px; height: auto; object-fit: contain; }
+.brand--light .brand-logo { filter: brightness(0) invert(94%) sepia(8%) saturate(269%) hue-rotate(330deg) brightness(104%) contrast(95%); }
+.field-mark { object-fit: contain; }
+.phone-screen.phone-screen--capture { min-height: 0; padding: 0; background: #fff; aspect-ratio: 738 / 1600; }
+.phone-interface { display: block; width: 100%; height: 100%; object-fit: contain; }
+@media (max-width: 600px) { .brand-logo { width: 124px; } }
+
+.sensor-brand .field-mark { width: 18px; height: 18px; }

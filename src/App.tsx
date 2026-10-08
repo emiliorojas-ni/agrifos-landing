@@ -884,7 +884,7 @@ export default function App() {
             </h2>
             <div className="footer-contact">
               <p className="footer-label">Encontremos una mejor dirección</p>
-              <a href="mailto:hola@agrifos.ag">hola@agrifos.ag</a>
+              <a href="mailto:agrifos.app@gmail.com">agrifos.app@gmail.com</a>
               <p>León, Nicaragua</p>
             </div>
           </div>

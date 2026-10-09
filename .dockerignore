@@ -18,3 +18,12 @@ logs
 *.tsbuildinfo
 vite.config.*.timestamp-*
 README.md
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.tmp
+coverage
+playwright-report
+test-results

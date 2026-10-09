@@ -2,6 +2,7 @@ import logotipo from "./assets/agrifos-logotipo.svg"
 import isotipo from "./assets/agrifos-isotipo.svg"
 import panelGeneral from "./assets/panel-general.png"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
+import DemoRequest from "./components/DemoRequest"
 
 const ArrowUpRight = ({ className = "" }: { className?: string }) => (
   <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
@@ -413,10 +414,10 @@ export default function App() {
             <a href="#proposito">Propósito</a>
             <a href="#pilares">Nuestros pilares</a>
             <a href="#historias">Historias</a>
-            <a className="mobile-contact" href="#contacto">Hablemos <ArrowUpRight /></a>
+            <a className="mobile-contact" href="#demo">Solicitar demo <ArrowUpRight /></a>
           </nav>
-          <a className="button button--forest button--small" href="#contacto">
-            Hablemos
+          <a className="button button--forest button--small" href="#demo">
+            Solicitar demo
             <ArrowUpRight />
           </a>
         </div>
@@ -450,8 +451,8 @@ export default function App() {
               tecnología que permite verla con mayor precisión.
             </p>
             <div className="hero-actions">
-              <a className="button button--ochre" href="#proposito">
-                Conoce más
+              <a className="button button--ochre" href="#demo">
+                Solicitar demo
                 <ArrowUpRight />
               </a>
               <span>Decisiones con raíz y dirección.</span>
@@ -921,6 +922,8 @@ export default function App() {
           </div>
         </div>
       </section>
+
+      <DemoRequest />
 
       <footer id="contacto">
         <div className="footer-sun" aria-hidden="true">

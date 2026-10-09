@@ -630,7 +630,7 @@ function RequestDetails({
 }
 
 function InstallerUpload({ onSaved }: { onSaved: () => void }) {
-  const [platform, setPlatform] = useState<Platform>("android")
+  const platform: Platform = "android"
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
   const [fileKey, setFileKey] = useState(0)
@@ -642,11 +642,11 @@ function InstallerUpload({ onSaved }: { onSaved: () => void }) {
     const file = data.get("file") as File
     if (
       !file.size ||
-      file.size > 200 * 1024 * 1024 ||
+      file.size > 50 * 1024 * 1024 ||
       !file.name.toLowerCase().endsWith(extensions[platform])
     ) {
       setError(
-        `Selecciona un archivo ${extensions[platform].toUpperCase()} válido de hasta 200 MB.`,
+        "Selecciona un archivo APK válido de hasta 50 MB.",
       )
       return
     }
@@ -687,7 +687,6 @@ function InstallerUpload({ onSaved }: { onSaved: () => void }) {
         })
       if (record.error) throw record.error
       form.reset()
-      setPlatform("android")
       setFileKey((value) => value + 1)
       onSaved()
     } catch {
@@ -715,20 +714,7 @@ function InstallerUpload({ onSaved }: { onSaved: () => void }) {
         <div className="admin-upload-grid">
           <label>
             Plataforma
-            <select
-              value={platform}
-              name="platform"
-              onChange={(event) => {
-                setPlatform(event.target.value as Platform)
-                setFileKey((value) => value + 1)
-              }}
-            >
-              {Object.entries(platforms).map(([value, label]) => (
-                <option value={value} key={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <input value="Android" readOnly />
           </label>
           <label>
             Versión
@@ -738,7 +724,7 @@ function InstallerUpload({ onSaved }: { onSaved: () => void }) {
             Arquitectura
             <select name="architecture">
               <option>ARM64</option>
-              <option>x64</option>
+              <option>ARM32</option>
               <option>Universal</option>
             </select>
           </label>
@@ -754,7 +740,7 @@ function InstallerUpload({ onSaved }: { onSaved: () => void }) {
           </label>
         </div>
         <p className="admin-help">
-          Hasta 200 MB, sujeto al límite del servicio de almacenamiento. Usa
+          Hasta 50 MB. Usa
           compilaciones verificadas de la aplicación.
         </p>
         {error && <p role="alert">{error}</p>}

@@ -22,7 +22,7 @@ Contacto: agrifos.app@gmail.com
 ## Solicitudes de demo
 
 El panel privado está disponible en `/#/admin`. La integración de Supabase
-permite gestionar solicitudes y publicar instaladores APK, DMG y EXE.
+permite gestionar solicitudes y publicar instaladores APK para Android.
 La configuración y el despliegue están descritos en
 [supabase/README.md](supabase/README.md).
 Cuando Supabase está conectado, las solicitudes se almacenan allí; sin esa

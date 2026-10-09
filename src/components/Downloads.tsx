@@ -46,7 +46,7 @@ export default function Downloads() {
         <div className="downloads-heading">
           <h2 id="downloads-title">Ágrifos, donde estés.</h2>
           <p>
-            Encuentra la versión disponible para tu dispositivo y lleva la
+            Descarga la aplicación para Android y lleva la
             inteligencia al campo.
           </p>
         </div>
@@ -63,11 +63,7 @@ export default function Downloads() {
             return (
               <article className="download-card" key={platform}>
                 <span className="download-platform">
-                  {platform === "android"
-                    ? "APK"
-                    : platform === "macos"
-                      ? "DMG"
-                      : "EXE"}
+                  APK
                 </span>
                 <h3>{platforms[platform]}</h3>
                 <p>

@@ -19,14 +19,10 @@ export const functionsUrl = url ? `${url.replace(/\/$/, "")}/functions/v1` : ""
 
 export const platforms = {
   android: "Android",
-  macos: "macOS",
-  windows: "Windows",
 } as const
 export type Platform = keyof typeof platforms
 export const extensions = {
   android: ".apk",
-  macos: ".dmg",
-  windows: ".exe",
 } as const
 export const requestStatuses = {
   new: "Nueva",

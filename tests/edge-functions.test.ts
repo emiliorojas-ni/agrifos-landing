@@ -9,6 +9,7 @@ Deno.test("Intake validation and published downloads", async () => {
   const environment = {
     ALLOWED_ORIGINS: "https://agrifos.app",
     TURNSTILE_SECRET_KEY: "test-only",
+    DEMO_RATE_LIMIT_SECRET: "test-only-quota-secret",
     SUPABASE_URL: "https://test.supabase.co",
     SUPABASE_SERVICE_ROLE_KEY: "test-only-service-key",
   };
@@ -18,7 +19,7 @@ Deno.test("Intake validation and published downloads", async () => {
   for (const [key, value] of Object.entries(environment)) {
     Deno.env.set(key, value);
   }
-  let saved = 0, challenge = "valid", published = false;
+  let saved = 0, challenge = "valid", published = false, quota = true;
   globalThis.fetch = async (input: RequestInfo | URL) => {
     const url = typeof input === "string"
       ? input
@@ -36,6 +37,11 @@ Deno.test("Intake validation and published downloads", async () => {
         }),
         { headers: { "Content-Type": "application/json" } },
       );
+    }
+    if (url.includes("/rest/v1/rpc/consume_demo_quota")) {
+      return new Response(JSON.stringify(quota), {
+        headers: { "Content-Type": "application/json" },
+      });
     }
     if (url.includes("/rest/v1/demo_requests")) {
       saved++;
@@ -80,6 +86,7 @@ Deno.test("Intake validation and published downloads", async () => {
     message: "",
     consent: true,
     token: "test-token",
+    website: "",
   };
   const request = (data = body, origin = "https://agrifos.app") =>
     new Request("https://test.supabase.co/functions/v1/submit-demo", {
@@ -114,6 +121,26 @@ Deno.test("Intake validation and published downloads", async () => {
     assert(
       (await submit(request())).status === 201 && saved === 1,
       "Verified request not saved",
+    );
+    Deno.env.delete("TURNSTILE_SECRET_KEY");
+    assert(
+      (await submit(request({ ...body, token: "" }))).status === 201,
+      "Quota-only submission failed",
+    );
+    const savedBefore = saved;
+    assert(
+      (await submit(request({ ...body, website: "spam" }))).status === 400,
+      "Honeypot accepted",
+    );
+    quota = false;
+    assert(
+      (await submit(request())).status === 429 && saved === savedBefore,
+      "Quota bypassed",
+    );
+    Deno.env.delete("DEMO_RATE_LIMIT_SECRET");
+    assert(
+      (await submit(request())).status === 503,
+      "Missing quota secret did not fail closed",
     );
     const url =
       "https://test.supabase.co/functions/v1/download-installer?id=33333333-3333-4333-8333-333333333333";

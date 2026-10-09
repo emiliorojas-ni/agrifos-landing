@@ -59,20 +59,20 @@ grant execute on function public.list_demo_requests(text,text,integer) to authen
 
 create table public.installers (
   id uuid primary key default gen_random_uuid(),
-  platform text not null check (platform in ('android', 'macos', 'windows')),
+  platform text not null check (platform = 'android'),
   version text not null check (length(version) <= 64 and version ~ '^\d+\.\d+\.\d+([-+][a-zA-Z0-9.-]+)?$'),
-  architecture text not null check (architecture in ('ARM64', 'x64', 'Universal')),
+  architecture text not null check (architecture in ('ARM64', 'ARM32', 'Universal')),
   file_name text not null check (length(file_name) between 1 and 255),
-  size_bytes bigint not null check (size_bytes > 0 and size_bytes <= 209715200),
+  size_bytes bigint not null check (size_bytes > 0 and size_bytes <= 52428800),
   source text not null check (source in ('github', 'storage')),
   storage_path text unique,
   external_url text,
   is_published boolean not null default false,
   uploaded_by uuid default auth.uid() references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
-  check ((platform = 'android' and lower(file_name) like '%.apk') or (platform = 'macos' and lower(file_name) like '%.dmg') or (platform = 'windows' and lower(file_name) like '%.exe')),
+  check (lower(file_name) like '%.apk'),
   check ((source = 'github' and storage_path is null and external_url is not null and external_url ~ '^https://github\.com/ferjovel06/agrifos/releases/download/[^/]+/[^/?#]+$')
-    or (source = 'storage' and external_url is null and storage_path is not null and storage_path ~ '^(android|macos|windows)/[0-9a-f-]{36}/[a-z0-9._-]+$' and split_part(storage_path, '/', 1) = platform and lower(storage_path) like '%' || case platform when 'android' then '.apk' when 'macos' then '.dmg' else '.exe' end))
+    or (source = 'storage' and external_url is null and storage_path is not null and storage_path ~ '^android/[0-9a-f-]{36}/[a-z0-9._-]+\.apk$'))
 );
 create unique index one_published_installer on public.installers(platform) where is_published;
 alter table public.installers enable row level security;
@@ -87,11 +87,11 @@ create policy admin_insert_installers on public.installers for insert to authent
 create policy admin_update_installers on public.installers for update to authenticated using ((select public.is_admin())) with check ((select public.is_admin()));
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
-values ('installers','installers',false,209715200,array['application/octet-stream']);
+values ('installers','installers',false,52428800,array['application/octet-stream']);
 create policy admin_read_installer_files on storage.objects for select to authenticated using (bucket_id = 'installers' and (select public.is_admin()));
 create policy admin_upload_installer_files on storage.objects for insert to authenticated with check (
   bucket_id = 'installers' and (select public.is_admin()) and
-  (name ~ '^android/[0-9a-f-]{36}/[a-z0-9._-]+\.apk$' or name ~ '^macos/[0-9a-f-]{36}/[a-z0-9._-]+\.dmg$' or name ~ '^windows/[0-9a-f-]{36}/[a-z0-9._-]+\.exe$')
+  name ~ '^android/[0-9a-f-]{36}/[a-z0-9._-]+\.apk$'
 );
 create policy admin_delete_installer_files on storage.objects for delete to authenticated using (bucket_id = 'installers' and (select public.is_admin()));
 

@@ -6,13 +6,16 @@ de PostgreSQL y Storage comprueban la autorización en cada operación.
 
 ## Configurar el servicio
 
-1. Crea un proyecto en [Supabase](https://supabase.com/dashboard).
-2. Ejecuta `migrations/202610090001_admin.sql` en el SQL Editor del proyecto,
+1. Crea un proyecto Free en [Supabase](https://supabase.com/dashboard), o usa el
+   proyecto de Ágrifos existente. No requiere cambiar de plan.
+2. Ejecuta las migraciones de `migrations/` en orden en el SQL Editor del proyecto,
    o aplica la migración con la CLI (`supabase link` y `supabase db push`).
    La migración crea el esquema, el bucket privado y la referencia al APK
    Android ARM64 de la publicación v1.0.0. No descarga ni duplica ese archivo.
-3. En Authentication, deshabilita el registro público de nuevos usuarios.
-   Crea la cuenta administrativa desde el Dashboard y confirma su correo.
+3. Usa una cuenta existente de Authentication o crea una cuenta administrativa
+   desde el Dashboard y confirma su correo. En un proyecto exclusivo del panel,
+   puedes deshabilitar el registro público. Si comparte proyecto con la app,
+   conserva la configuración de registro de la app.
    El panel no permite registros ni asignación de permisos.
 4. Autoriza su UUID desde el SQL Editor:
 
@@ -23,12 +26,15 @@ de PostgreSQL y Storage comprueban la autorización en cada operación.
 
    Para retirar el permiso, elimina únicamente esa fila. Una cuenta válida
    que no figure en esta tabla no puede leer solicitudes ni cargar archivos.
-5. Crea un widget [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/get-started/)
+5. Opcional: crea un widget [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/get-started/)
    para `agrifos.app` y, si vas a probar localmente, `localhost`.
-   La verificación evita envíos automatizados al endpoint público de solicitudes.
+   La verificación añade un desafío contra envíos automatizados. Sin este widget,
+   el formulario usa el campo trampa y límites transaccionales en Supabase.
 6. Copia `functions/.env.example` a `functions/.env` y completa
-   `TURNSTILE_SECRET_KEY` y `ALLOWED_ORIGINS` (orígenes exactos, separados por
-   comas, sin barra final). La clave secreta solo se usa en el servidor.
+   `DEMO_RATE_LIMIT_SECRET` (secreto aleatorio de al menos 32 bytes) y
+   `ALLOWED_ORIGINS` (orígenes exactos, separados por
+   comas, sin barra final). Si usas Turnstile, añade `TURNSTILE_SECRET_KEY`.
+   Estos secretos solo se usan en el servidor.
 7. Desde un equipo con la CLI de Supabase instalada, vincula el proyecto,
    establece los secretos y despliega las dos funciones:
 
@@ -40,8 +46,9 @@ de PostgreSQL y Storage comprueban la autorización en cada operación.
    supabase functions deploy download-installer --no-verify-jwt
    ```
 
-   Son endpoints públicos por diseño: `submit-demo` exige un token Turnstile
-   válido, su hostname y la acción `demo-request`; `download-installer` solo
+   Son endpoints públicos por diseño: `submit-demo` valida los datos y exige la
+   cuota de envío; si hay secreto Turnstile configurado, también exige su token,
+   hostname y acción `demo-request`. `download-installer` solo
    entrega archivos publicados. Las operaciones administrativas usan la
    sesión de Supabase Auth y RLS. Supabase proporciona las variables privadas
    `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` a las funciones.
@@ -50,12 +57,23 @@ de PostgreSQL y Storage comprueban la autorización en cada operación.
    ```dotenv
    VITE_SUPABASE_URL=https://TU_PROJECT_REF.supabase.co
    VITE_SUPABASE_PUBLISHABLE_KEY=CLAVE_PUBLICA_DEL_PROYECTO
-   VITE_TURNSTILE_SITE_KEY=CLAVE_PUBLICA_DEL_WIDGET
+   VITE_TURNSTILE_SITE_KEY=
    ```
 
    Usa la clave **publishable** (o la clave pública `anon` compatible). Nunca
    uses `service_role`, una clave `secret`, ni la clave secreta de Turnstile
    en variables `VITE_*`: se incorporan al JavaScript público.
+   Solo completa `VITE_TURNSTILE_SITE_KEY` si configuraste el secreto del widget.
+
+## Integración configurada
+
+El proyecto `Agrifos` (`nquoibsuhgbomlbsljvs`) está en la organización Free.
+Se aplicaron las dos migraciones y se desplegaron `submit-demo` y
+`download-installer`. La cuenta existente del propietario tiene acceso al panel;
+su contraseña y la configuración de registro de la aplicación se conservan.
+La configuración pública local está en `.env.local` y los secretos en
+`supabase/functions/.env`, ambos excluidos de Git. El JavaScript compilado contiene
+solo la clave pública; los permisos se comprueban mediante RLS.
 
 ## Construcción y publicación
 
@@ -87,10 +105,16 @@ un servidor Node en producción: las funciones se ejecutan en Supabase.
 - Estados: Nueva, Contactada, Demo agendada, Completada y Archivada. Hay
   búsqueda, paginación de 25 solicitudes y notas internas. Archivar conserva
   la información; no elimina registros.
-- Cada instalador cargado queda como borrador en un bucket privado. Se admite
-  APK para Android, DMG para macOS y EXE para Windows, hasta 200 MB. El límite
-  global del proyecto Supabase también debe permitir ese tamaño; ajústalo
-  según las versiones y el plan contratado.
+- Cada instalador cargado queda como borrador en un bucket privado. Solo se
+  admite APK para Android, hasta 50 MB, compatible con el plan Free. El APK
+  inicial continúa alojado en GitHub para no duplicar almacenamiento ni tráfico.
+- Los envíos tienen un límite de 3 por ventana de una hora por IP y correo,
+  y 100 por día en total. Se guardan HMAC de IP/correo con secreto del servidor;
+  los contadores caducados se limpian en cada envío. La IP procede del gateway
+  de Supabase y el límite global también protege si cambia la IP. Una red
+  compartida puede alcanzar el límite; el usuario puede escribir al correo de
+  contacto. Esta protección limita los registros guardados, no las invocaciones
+  que cuentan para la cuota Free. Turnstile sigue disponible como refuerzo.
 - Publicar una versión retira la publicación anterior de esa plataforma de
   forma transaccional. Los borradores solo pueden descargarse con una sesión
   administrativa; las descargas públicas reciben URLs firmadas de 60 segundos.
@@ -102,8 +126,8 @@ un servidor Node en producción: las funciones se ejecutan en Supabase.
 ## Verificación antes de habilitarlo
 
 Prueba en el proyecto configurado: acceso con una cuenta autorizada y con otra
-sin permiso; solicitud real con Turnstile; cambio de estado; carga de cada
-formato; publicación y retirada; y rechazo de descargas de borradores.
+sin permiso; solicitud real; cambio de estado; carga de un APK;
+publicación y retirada; y rechazo de descargas de borradores.
 Las pruebas locales con respuestas simuladas no sustituyen esta verificación
 del servicio desplegado. No uses datos personales reales para las pruebas.
 
@@ -114,7 +138,10 @@ un proyecto real. Comprueban los permisos y las reglas de publicación.
 Con Deno instalado, comprueba los endpoints con servicios simulados:
 
 ```sh
-deno test --allow-env tests/edge-functions.test.ts
+deno test --node-modules-dir=auto --allow-env tests/edge-functions.test.ts
 ```
 
 Esta prueba no envía correos ni usa un proyecto Supabase real.
+`tests/demo-rate-limits.sql` comprueba límites por IP, correo y global, además
+del rechazo de cambios a la cuota por usuarios del navegador. Se ejecuta después
+de las migraciones en la misma base desechable de las pruebas de permisos.

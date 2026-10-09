@@ -35,7 +35,7 @@ export default function DemoRequest() {
 
     try {
       if (supabase) {
-        if (!turnstileSiteKey || !verification)
+        if (turnstileSiteKey && !verification)
           throw new Error("Verification required")
         const { data: result, error } = await supabase.functions.invoke(
           "submit-demo",
@@ -49,6 +49,7 @@ export default function DemoRequest() {
               message: String(data.get("message") || "").trim(),
               consent: data.get("consent") === "on",
               token: verification,
+              website: String(data.get("_honey") || ""),
             },
             signal: controller.signal,
           },
@@ -303,16 +304,10 @@ export default function DemoRequest() {
                 {supabase && turnstileSiteKey && (
                   <Turnstile key={verificationKey} onToken={setVerification} />
                 )}
-                {supabase && !turnstileSiteKey && (
-                  <p className="demo-error" role="alert">
-                    El formulario no está disponible por el momento. Escríbenos
-                    a <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
-                  </p>
-                )}
                 <button
                   className="button button--forest demo-submit"
                   type="submit"
-                  disabled={!!supabase && !verification}
+                  disabled={!!supabase && !!turnstileSiteKey && !verification}
                 >
                   {status === "sending"
                     ? "Enviando solicitud…"

@@ -19,3 +19,21 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+
+# Local agent state and credentials.
+/.agents/
+/.codex/
+/.aws/
+
+# OS files and temporary editor files.
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.tmp
+
+# Local test reports.
+coverage/
+playwright-report/
+test-results/

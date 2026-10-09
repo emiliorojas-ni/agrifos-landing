@@ -7,6 +7,9 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+ARG VITE_SUPABASE_URL=""
+ARG VITE_SUPABASE_PUBLISHABLE_KEY=""
+ARG VITE_TURNSTILE_SITE_KEY=""
 RUN pnpm build
 
 FROM nginx:stable-alpine AS production

@@ -66,17 +66,16 @@ export const initialAndroid: Installer = {
   architecture: "ARM64",
   file_name: "agrifos-v1.0.0-android-arm64.apk",
   size_bytes: 22600581,
-  storage_path: null,
-  source: "github",
+  storage_path: "android/00000000-0000-4000-8000-000000000001/agrifos-v1.0.0-android-arm64.apk",
+  source: "storage",
   is_published: true,
   created_at: "",
-  external_url:
-    "https://github.com/ferjovel06/agrifos/releases/download/v1.0.0/agrifos-v1.0.0-android-arm64.apk",
+  external_url: null,
 }
 export function downloadUrl(installer: Installer) {
   return installer.source === "github"
     ? installer.external_url!
-    : `${functionsUrl}/download-installer?id=${installer.id}`
+    : `${functionsUrl || "https://nquoibsuhgbomlbsljvs.supabase.co/functions/v1"}/download-installer?id=${installer.id}`
 }
 export function fileSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`

@@ -105,7 +105,7 @@ un servidor Node en producción: las funciones se ejecutan en Supabase.
 ## Comportamiento
 
 - Sin configuración de Supabase, el formulario conserva el envío a FormSubmit,
-  el APK existente se enlaza desde GitHub y el panel indica que falta conectar
+  el APK inicial se descarga mediante la función pública de Ágrifos y el panel indica que falta conectar
   el servicio. No hay usuarios, contraseñas ni datos de muestra embebidos.
 - Con Supabase configurado, las nuevas solicitudes se guardan en la base de
   datos y se gestionan en el panel. También se notifican por FormSubmit a
@@ -117,7 +117,12 @@ un servidor Node en producción: las funciones se ejecutan en Supabase.
   la información; no elimina registros.
 - Cada instalador cargado queda como borrador en un bucket privado. Solo se
   admite APK para Android, hasta 50 MB, compatible con el plan Free. El APK
-  inicial continúa alojado en GitHub para no duplicar almacenamiento ni tráfico.
+  inicial se aloja en Supabase Storage porque el repositorio de GitHub es privado.
+  La función de descarga emite un enlace firmado con el nombre del APK, sin
+  requerir una sesión de GitHub. Se verificó el SHA-256 contra `SHA256SUMS.txt`
+  del release original antes de cargar los 22.6 MB al almacenamiento del plan Free.
+  En un proyecto nuevo, la migración inicial conserva el registro de origen:
+  carga el APK y publica su registro de Storage antes de habilitar las descargas.
 - Los envíos tienen un límite de 3 por ventana de una hora por IP y correo,
   y 100 por día en total. Se guardan HMAC de IP/correo con secreto del servidor;
   los contadores caducados se limpian en cada envío. La IP procede del gateway

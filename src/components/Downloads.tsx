@@ -85,14 +85,7 @@ export default function Downloads() {
                 )}
               </article>
         <p className="download-note">
-          Instala únicamente versiones compatibles con tu dispositivo.{" "}
-          <a
-            href="https://github.com/ferjovel06/agrifos/releases/tag/v1.0.0"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Ver publicación original ↗
-          </a>
+          Instala únicamente versiones compatibles con tu dispositivo.
         </p>
         </div>
         <figure className="download-visual">

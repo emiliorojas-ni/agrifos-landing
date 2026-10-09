@@ -7,7 +7,7 @@ import {
   type Installer,
 } from "../lib/supabase"
 import "./downloads.css"
-import panelGeneral from "../assets/panel-general.png"
+import finanzas from "../assets/finanzas.jpeg"
 
 export default function Downloads() {
   const [installers, setInstallers] = useState<Installer[]>(
@@ -101,7 +101,7 @@ export default function Downloads() {
             <span aria-hidden="true">↗</span>
           </div>
           <div className="download-phone">
-            <img src={panelGeneral} alt="Vista de la aplicación Ágrifos para Android: condiciones del cultivo y lecturas del suelo." width="738" height="1600" loading="lazy" />
+            <img src={finanzas} alt="Pantalla de Finanzas de Ágrifos para Android: balance, ingresos, gastos y flujo de caja." width="785" height="1600" loading="lazy" />
           </div>
           <figcaption>El conocimiento del campo.<br /><em>Ahora, en tu bolsillo.</em></figcaption>
         </figure>

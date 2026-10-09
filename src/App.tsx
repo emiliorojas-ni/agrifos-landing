@@ -938,8 +938,7 @@ export default function App() {
           <div className="footer-main" data-reveal="up">
             <h2>
               Conocimiento que
-              <br />
-              vuelve a la tierra.
+              <br /> vuelve a la tierra.
             </h2>
             <div className="footer-contact">
               <p className="footer-label">Encontremos una mejor dirección</p>

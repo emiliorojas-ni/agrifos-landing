@@ -3,6 +3,7 @@ import isotipo from "./assets/agrifos-isotipo.svg"
 import panelGeneral from "./assets/panel-general.png"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import DemoRequest from "./components/DemoRequest"
+import Downloads from "./components/Downloads"
 
 const ArrowUpRight = ({ className = "" }: { className?: string }) => (
   <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
@@ -923,6 +924,7 @@ export default function App() {
         </div>
       </section>
 
+      <Downloads />
       <DemoRequest />
 
       <footer id="contacto">
@@ -951,6 +953,7 @@ export default function App() {
             <div>
               <a href="#linkedin">LinkedIn</a>
               <a href="#instagram">Instagram</a>
+              <a href="#/admin">Acceso privado</a>
             </div>
             <a href="#inicio">Volver arriba ↑</a>
           </div>

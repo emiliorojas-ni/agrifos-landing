@@ -1,0 +1,7 @@
+project_id = "agrifos-landing"
+
+[functions.submit-demo]
+verify_jwt = false
+
+[functions.download-installer]
+verify_jwt = false

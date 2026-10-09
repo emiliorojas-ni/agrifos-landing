@@ -72,6 +72,9 @@
 .demo-form-note a, .demo-error a { text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
 .demo-error { padding: 14px; border-left: 3px solid var(--chocolate); background: #eeded4; color: var(--chocolate); font-size: 13px; line-height: 1.6; }
 .demo-honeypot { display: none; }
+.demo-verification { margin: 0 0 20px; min-width: 0; }
+.demo-verification p { font-size: 12px; line-height: 1.6; }
+.demo-submit:disabled { cursor: not-allowed; opacity: .6; }
 .demo-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .demo-confirmation { padding-block: 36px; outline: none; }
 .demo-confirmation-mark { display: grid; width: 64px; height: 64px; margin-bottom: 32px; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--forest); font-size: 28px; }

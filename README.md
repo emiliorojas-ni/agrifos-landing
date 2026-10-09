@@ -21,6 +21,13 @@ Contacto: agrifos.app@gmail.com
 
 ## Solicitudes de demo
 
+El panel privado está disponible en `/#/admin`. La integración de Supabase
+permite gestionar solicitudes y publicar instaladores APK, DMG y EXE.
+La configuración y el despliegue están descritos en
+[supabase/README.md](supabase/README.md).
+Cuando Supabase está conectado, las solicitudes se almacenan allí; sin esa
+configuración se mantiene el envío por correo descrito a continuación.
+
 El formulario de la landing envía las solicitudes a `agrifos.app@gmail.com`
 mediante [FormSubmit](https://formsubmit.co/), usando su endpoint AJAX para
 mantener al visitante en la página. No requiere claves ni un servidor propio.

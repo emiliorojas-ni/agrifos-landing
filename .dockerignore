@@ -1,4 +1,6 @@
 node_modules
+.pnpm-store
+tests
 dist
 build
 docs
@@ -10,6 +12,8 @@ docs
 .opencode-skills
 .figma/design-context
 .env*
+**/.env*
+supabase
 .cache
 .vite
 .tmp-*

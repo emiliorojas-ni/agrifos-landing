@@ -1,0 +1,99 @@
+.demo-request {
+  position: relative;
+  padding-block: 100px;
+  border-top: 1px solid var(--line);
+  background: #efe5dc;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: clamp(32px, 5vw, 76px);
+}
+
+.demo-intro { min-width: 0; padding-top: 20px; }
+.demo-intro .section-number { margin-bottom: 24px; }
+.demo-intro h2 {
+  margin: 0;
+  color: var(--forest);
+  font-family: var(--font-display);
+  font-size: clamp(44px, 4.7vw, 66px);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+.demo-intro h2 em { color: var(--chocolate); font-style: normal; }
+.demo-lead { max-width: 440px; margin: 28px 0 0; font-size: 17px; line-height: 1.75; }
+.demo-steps { display: grid; gap: 24px; margin: 40px 0; padding: 0; list-style: none; }
+.demo-steps li { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 16px; }
+.demo-steps li > span { padding-top: 4px; color: var(--chocolate); font-family: var(--font-display); font-size: 14px; }
+.demo-steps strong { color: var(--forest); font-size: 15px; }
+.demo-steps p { margin: 6px 0 0; max-width: 360px; font-size: 14px; line-height: 1.6; }
+.demo-direct { padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.8; }
+.demo-direct a { display: block; width: fit-content; color: var(--forest); font-weight: 700; overflow-wrap: anywhere; text-decoration: underline; text-underline-offset: 4px; }
+
+.demo-card { min-width: 0; padding: clamp(24px, 3.2vw, 44px); border: 1px solid var(--line); border-radius: 3px 28px 3px 3px; background: var(--linen); box-shadow: 0 24px 60px rgba(49, 84, 59, 0.07); }
+.demo-card-eyebrow { margin: 0 0 10px; color: var(--chocolate); font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+.demo-card h3 { margin: 0; color: var(--forest); font-family: var(--font-display); font-size: 34px; font-weight: 500; line-height: 1.1; letter-spacing: -0.035em; }
+.demo-form-heading > p:last-child { margin: 12px 0 28px; font-size: 12px; }
+.demo-form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.demo-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; }
+.demo-fields label { display: block; min-width: 0; color: var(--forest); font-size: 13px; font-weight: 700; }
+.demo-fields label > span { color: var(--chocolate); }
+.demo-fields label small { margin-left: 4px; color: #666d61; font-size: 10px; font-weight: 400; }
+.demo-field-full { grid-column: 1 / -1; }
+.demo-fields input, .demo-fields select, .demo-fields textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid rgba(49, 84, 59, 0.35);
+  border-radius: 4px;
+  background: #fffaf6;
+  color: var(--charcoal);
+  font: 400 16px/1.5 var(--font-body);
+}
+.demo-fields input::placeholder, .demo-fields textarea::placeholder { color: #6b7167; opacity: 1; }
+.demo-fields textarea { min-height: 108px; resize: vertical; }
+.demo-fields select { padding-right: 24px; }
+.demo-fields :is(input, select, textarea):focus-visible, .demo-consent input:focus-visible, .demo-card button:focus-visible, .demo-request a:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+}
+.demo-consent { display: flex; align-items: flex-start; gap: 12px; margin-block: 24px; color: var(--charcoal); font-size: 12px; line-height: 1.65; cursor: pointer; }
+.demo-consent input { flex: 0 0 18px; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--forest); }
+.demo-submit { width: 100%; min-height: 52px; border: 0; cursor: pointer; font-family: var(--font-body); }
+.demo-form fieldset:disabled { opacity: 0.65; }
+.demo-form fieldset:disabled .demo-submit { cursor: wait; transform: none; }
+.demo-form-note { margin: 16px 0 0; color: #666d61; font-size: 11px; line-height: 1.6; }
+.demo-form-note a, .demo-error a { text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.demo-error { padding: 14px; border-left: 3px solid var(--chocolate); background: #eeded4; color: var(--chocolate); font-size: 13px; line-height: 1.6; }
+.demo-honeypot { display: none; }
+.demo-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.demo-confirmation { padding-block: 36px; outline: none; }
+.demo-confirmation-mark { display: grid; width: 64px; height: 64px; margin-bottom: 32px; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--forest); font-size: 28px; }
+.demo-confirmation > p:not(.demo-card-eyebrow) { margin: 24px 0 32px; line-height: 1.75; }
+.demo-confirmation button { max-width: 100%; border: 0; gap: 18px; font-family: var(--font-body); cursor: pointer; }
+
+@media (max-width: 1000px) {
+  .demo-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .demo-intro { padding-top: 0; }
+  .demo-intro h2, .demo-lead { max-width: 640px; }
+  .demo-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .demo-steps li { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+}
+
+@media (max-width: 640px) {
+  .demo-request { padding-block: 60px; }
+  .demo-grid { gap: 28px; }
+  .demo-intro h2 { font-size: clamp(34px, 9vw, 44px); }
+  .demo-lead { font-size: 16px; }
+  .demo-steps { grid-template-columns: minmax(0, 1fr); margin-block: 32px; }
+  .demo-steps li { grid-template-columns: 28px minmax(0, 1fr); gap: 12px; }
+  .demo-card { padding: 24px 20px; }
+  .demo-card h3 { font-size: 30px; }
+  .demo-fields { grid-template-columns: minmax(0, 1fr); }
+}

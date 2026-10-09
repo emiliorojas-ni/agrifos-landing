@@ -255,8 +255,9 @@ export default function AdminPanel() {
     else window.location.assign(data.signedUrl)
   }
 
+  const authView = !allowed || recovery
   return (
-    <main className="admin-page">
+    <main className={`admin-page${authView ? " admin-page--auth" : ""}`}>
       <header className="admin-header shell">
         <a href="#inicio" aria-label="Ágrifos — volver al sitio">
           <img src={logo} alt="Ágrifos" />
@@ -270,12 +271,16 @@ export default function AdminPanel() {
           )}
         </div>
       </header>
-      <div className="shell admin-content">
+      <div className={`shell admin-content${authView ? " admin-content--auth" : ""}`}>
+        <div className="admin-intro">
         <p className="section-number section-number--dark">Gestión del campo</p>
-        <h1>Panel administrativo</h1>
+        <h1>Panel <em>administrativo.</em></h1>
         <p className="admin-lead">
           Solicitudes de demostración y versiones de Ágrifos, en un mismo lugar.
         </p>
+        {authView && <p className="admin-signature">Ágrifos · Inteligencia para el campo</p>}
+        </div>
+        <div className="admin-workspace">
         {notice && (
           <p className="admin-notice" role="status">
             {notice}
@@ -294,6 +299,7 @@ export default function AdminPanel() {
           <p role="status">Comprobando acceso…</p>
         ) : recovery && session ? (
           <form className="admin-card admin-login" onSubmit={changePassword}>
+            <p className="admin-form-eyebrow">Tu cuenta, a salvo</p>
             <h2>Elige una nueva contraseña</h2>
             <p>Este cambio también se aplica a tu cuenta en la aplicación Ágrifos.</p>
             <label>
@@ -306,10 +312,12 @@ export default function AdminPanel() {
             </label>
             <button className="button button--forest" type="submit" disabled={busy}>
               {busy ? "Guardando…" : "Guardar contraseña"}
+              <span aria-hidden="true">↗</span>
             </button>
           </form>
         ) : !session && forgotPassword ? (
           <form className="admin-card admin-login" onSubmit={requestRecovery}>
+            <p className="admin-form-eyebrow">Recuperación de acceso</p>
             <h2>Recupera tu acceso</h2>
             <p>Recibirás un enlace para elegir una nueva contraseña. Si tu enlace venció, solicita otro aquí.</p>
             <label>
@@ -318,8 +326,9 @@ export default function AdminPanel() {
             </label>
             <button className="button button--forest" type="submit" disabled={busy}>
               {busy ? "Enviando…" : "Enviar enlace"}
+              <span aria-hidden="true">↗</span>
             </button>
-            <button type="button" disabled={busy} onClick={() => {
+            <button className="admin-text-button" type="button" disabled={busy} onClick={() => {
               window.history.replaceState(null, "", `${window.location.pathname}#/admin`)
               setRecovery(false)
               setForgotPassword(false)
@@ -328,6 +337,7 @@ export default function AdminPanel() {
           </form>
         ) : !session ? (
           <form className="admin-card admin-login" onSubmit={login}>
+            <p className="admin-form-eyebrow">Acceso del equipo</p>
             <h2>Acceso privado</h2>
             <p>Inicia sesión con tu cuenta administrativa.</p>
             <label>
@@ -358,7 +368,7 @@ export default function AdminPanel() {
               {busy ? "Iniciando sesión…" : "Entrar al panel"}
               <span aria-hidden="true">↗</span>
             </button>
-            <button type="button" disabled={busy} onClick={() => {
+            <button className="admin-text-button" type="button" disabled={busy} onClick={() => {
               setForgotPassword(true)
               setNotice("")
             }}>Olvidé mi contraseña</button>
@@ -617,6 +627,7 @@ export default function AdminPanel() {
             </>
           )
         )}
+        </div>
       </div>
     </main>
   )

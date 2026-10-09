@@ -121,7 +121,6 @@ export default function DemoRequest() {
                       <option>Monitoreo del suelo</option>
                       <option>Seguimiento del cultivo</option>
                       <option>Recomendaciones para tomar decisiones</option>
-                      <option>La solución completa</option>
                     </select>
                   </label>
                   <label className="demo-field-full" htmlFor="demo-message">Cuéntanos un poco más <small>Opcional</small>

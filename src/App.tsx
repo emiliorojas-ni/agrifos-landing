@@ -574,9 +574,8 @@ export default function App() {
         </div>
         <div className="shell field-objects" data-reveal="up" ref={objectTrack}>
           <article
-            className={`object-card object-card--sensor ${
-              activeObject === 0 ? "is-expanded" : ""
-            }`}
+            className={`object-card object-card--sensor ${activeObject === 0 ? "is-expanded" : ""
+              }`}
             onClick={(event) => {
               if (!(event.target as HTMLElement).closest("a, button")) {
                 setActiveObject(activeObject === 0 ? -1 : 0)

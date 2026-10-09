@@ -71,6 +71,14 @@ El proyecto `Agrifos` (`nquoibsuhgbomlbsljvs`) está en la organización Free.
 Se aplicaron las dos migraciones y se desplegaron `submit-demo` y
 `download-installer`. La cuenta existente del propietario tiene acceso al panel;
 su contraseña y la configuración de registro de la aplicación se conservan.
+El panel incluye recuperación de contraseña. Supabase permite el retorno a
+`http://localhost:8081/?recovery=1` y `https://agrifos.app/?recovery=1`, además
+del enlace de la aplicación Android. El correo abre una pantalla para elegir
+la contraseña; cambiarla también afecta al acceso de esa cuenta en la app.
+La recuperación acepta la sesión del enlace y elimina sus tokens de la URL.
+El dominio público debe tener esta rama integrada antes de usar su retorno;
+mientras tanto, usa el panel local. No registres enlaces de recuperación ni
+contraseñas en Git.
 La configuración pública local está en `.env.local` y los secretos en
 `supabase/functions/.env`, ambos excluidos de Git. El JavaScript compilado contiene
 solo la clave pública; los permisos se comprueban mediante RLS.

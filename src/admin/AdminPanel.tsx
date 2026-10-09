@@ -23,12 +23,15 @@ function date(value: string) {
 }
 
 export default function AdminPanel() {
+  const recoveryRequested = new URLSearchParams(window.location.search).get("recovery") === "1"
   const [session, setSession] = useState<Session | null>(null)
   const [checking, setChecking] = useState(true)
   const [allowed, setAllowed] = useState(false)
   const [denied, setDenied] = useState(false)
   const [notice, setNotice] = useState("")
   const [busy, setBusy] = useState(false)
+  const [recovery, setRecovery] = useState(recoveryRequested)
+  const [forgotPassword, setForgotPassword] = useState(recoveryRequested)
   const [tab, setTab] = useState<"requests" | "installers">("requests")
   const [requests, setRequests] = useState<DemoRecord[]>([])
   const [total, setTotal] = useState(0)
@@ -55,7 +58,8 @@ export default function AdminPanel() {
       setSession(data.session)
       if (!data.session) setChecking(false)
     })
-    const { data } = supabase.auth.onAuthStateChange((_event, next) => {
+    const { data } = supabase.auth.onAuthStateChange((event, next) => {
+      if (event === "PASSWORD_RECOVERY") setRecovery(true)
       setSession(next)
       if (!next) {
         setAllowed(false)
@@ -89,7 +93,7 @@ export default function AdminPanel() {
   }, [session?.user.id])
 
   useEffect(() => {
-    if (!allowed || !supabase) return
+    if (!allowed || !supabase || recovery) return
     let alive = true
     setLoadingData(true)
     const timer = window.setTimeout(async () => {
@@ -129,7 +133,53 @@ export default function AdminPanel() {
       alive = false
       window.clearTimeout(timer)
     }
-  }, [allowed, search, filter, page, reload])
+  }, [allowed, recovery, search, filter, page, reload])
+
+  async function requestRecovery(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!supabase || busy) return
+    const values = new FormData(event.currentTarget)
+    setBusy(true)
+    setNotice("")
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        String(values.get("email")).trim(),
+        { redirectTo: `${window.location.origin}${window.location.pathname}?recovery=1` },
+      )
+      if (error) throw error
+      setNotice("Si el correo tiene una cuenta, recibirás un enlace para elegir tu nueva contraseña. Revisa también spam.")
+    } catch {
+      setNotice("No pudimos enviar el enlace. Espera unos minutos e intenta de nuevo.")
+    } finally {
+      setBusy(false)
+    }
+  }
+  async function changePassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!supabase || busy || !session) return
+    const form = event.currentTarget
+    const values = new FormData(form)
+    const password = String(values.get("password"))
+    if (password.length < 12 || password !== values.get("confirmation")) {
+      setNotice("Usa al menos 12 caracteres y escribe la misma contraseña en ambos campos.")
+      return
+    }
+    setBusy(true)
+    setNotice("")
+    try {
+      const { error } = await supabase.auth.updateUser({ password })
+      if (error) throw error
+      form.reset()
+      window.history.replaceState(null, "", `${window.location.pathname}#/admin`)
+      setRecovery(false)
+      setForgotPassword(false)
+      setNotice("Contraseña actualizada. Usa la nueva contraseña también en la aplicación Ágrifos.")
+    } catch {
+      setNotice("No pudimos cambiar la contraseña. Usa una contraseña diferente o solicita un enlace nuevo.")
+    } finally {
+      setBusy(false)
+    }
+  }
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -242,6 +292,40 @@ export default function AdminPanel() {
           </div>
         ) : checking ? (
           <p role="status">Comprobando acceso…</p>
+        ) : recovery && session ? (
+          <form className="admin-card admin-login" onSubmit={changePassword}>
+            <h2>Elige una nueva contraseña</h2>
+            <p>Este cambio también se aplica a tu cuenta en la aplicación Ágrifos.</p>
+            <label>
+              Nueva contraseña
+              <input name="password" type="password" autoComplete="new-password" minLength={12} maxLength={256} required />
+            </label>
+            <label>
+              Repite la contraseña
+              <input name="confirmation" type="password" autoComplete="new-password" minLength={12} maxLength={256} required />
+            </label>
+            <button className="button button--forest" type="submit" disabled={busy}>
+              {busy ? "Guardando…" : "Guardar contraseña"}
+            </button>
+          </form>
+        ) : !session && forgotPassword ? (
+          <form className="admin-card admin-login" onSubmit={requestRecovery}>
+            <h2>Recupera tu acceso</h2>
+            <p>Recibirás un enlace para elegir una nueva contraseña. Si tu enlace venció, solicita otro aquí.</p>
+            <label>
+              Correo electrónico
+              <input name="email" type="email" autoComplete="username" maxLength={254} required />
+            </label>
+            <button className="button button--forest" type="submit" disabled={busy}>
+              {busy ? "Enviando…" : "Enviar enlace"}
+            </button>
+            <button type="button" disabled={busy} onClick={() => {
+              window.history.replaceState(null, "", `${window.location.pathname}#/admin`)
+              setRecovery(false)
+              setForgotPassword(false)
+              setNotice("")
+            }}>Volver al acceso</button>
+          </form>
         ) : !session ? (
           <form className="admin-card admin-login" onSubmit={login}>
             <h2>Acceso privado</h2>
@@ -274,6 +358,10 @@ export default function AdminPanel() {
               {busy ? "Iniciando sesión…" : "Entrar al panel"}
               <span aria-hidden="true">↗</span>
             </button>
+            <button type="button" disabled={busy} onClick={() => {
+              setForgotPassword(true)
+              setNotice("")
+            }}>Olvidé mi contraseña</button>
           </form>
         ) : denied ? (
           <div className="admin-card">

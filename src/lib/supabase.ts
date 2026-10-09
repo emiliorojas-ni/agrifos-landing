@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js"
 
 const url = import.meta.env.VITE_SUPABASE_URL?.trim()
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim()
+export const recoveryRequested = new URLSearchParams(window.location.search).get("recovery") === "1"
 export const turnstileSiteKey =
   import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() || ""
 export const supabase =
@@ -11,7 +12,7 @@ export const supabase =
           storage: window.sessionStorage,
           persistSession: true,
           autoRefreshToken: true,
-          detectSessionInUrl: false,
+          detectSessionInUrl: recoveryRequested,
         },
       })
     : null

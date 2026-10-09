@@ -6,10 +6,12 @@ import "./responsive.css"
 
 const AdminPanel = lazy(() => import("./admin/AdminPanel"))
 function Root() {
-  const [admin, setAdmin] = useState(window.location.hash === "#/admin")
+  const [admin, setAdmin] = useState(
+    window.location.hash === "#/admin" || new URLSearchParams(window.location.search).get("recovery") === "1",
+  )
   useEffect(() => {
     const onHash = () => {
-      const next = window.location.hash === "#/admin"
+      const next = window.location.hash === "#/admin" || new URLSearchParams(window.location.search).get("recovery") === "1"
       setAdmin(next)
       if (next || admin) window.scrollTo(0, 0)
     }

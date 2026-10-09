@@ -44,6 +44,7 @@ export interface DemoRecord {
   status: RequestStatus
   notes: string
   created_at: string
+  notification_status?: "not_requested" | "pending" | "sent" | "activation_required" | "failed"
 }
 export interface Installer {
   id: string

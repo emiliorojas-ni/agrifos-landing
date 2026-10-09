@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2.117.3";
 import { allowedOrigins, cors, json, readBody } from "../_shared/http.ts";
+import { notifyDemoRequests } from "../_shared/demo-email.ts";
 
 export async function handleRequest(request: Request) {
   const origin = request.headers.get("Origin") || "";
@@ -62,6 +63,24 @@ export async function handleRequest(request: Request) {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { persistSession: false } },
     );
+    const id = body.submission_id || crypto.randomUUID();
+    if (typeof id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+      return json(request, { success: false }, 400);
+    }
+    const record = {
+      name: body.name.trim(), email: body.email.trim(),
+      organization: body.organization.trim(), phone: body.phone.trim(),
+      interest: body.interest, message: body.message.trim(), consent: true,
+    };
+    const { data: previous, error: lookupError } = await client.from("demo_requests")
+      .select("name,email,organization,phone,interest,message,consent").eq("id", id).maybeSingle();
+    if (lookupError) return json(request, { success: false }, 503);
+    if (previous) {
+      if (Object.entries(record).some(([key,value]) => previous[key as keyof typeof previous] !== value)) {
+        return json(request, { success: false }, 409);
+      }
+      return json(request, { success: true }, 201);
+    }
     const quotaSecret = Deno.env.get("DEMO_RATE_LIMIT_SECRET");
     if (!quotaSecret) return json(request, { success: false }, 503);
     const hmacKey = await crypto.subtle.importKey(
@@ -97,16 +116,9 @@ export async function handleRequest(request: Request) {
       response.headers.set("Retry-After", "3600");
       return response;
     }
-    const { error } = await client.from("demo_requests").insert({
-      name: body.name.trim(),
-      email: body.email.trim(),
-      organization: body.organization.trim(),
-      phone: body.phone.trim(),
-      interest: body.interest,
-      message: body.message.trim(),
-      consent: true,
-    });
+    const { error } = await client.from("demo_requests").insert({ id, ...record });
     if (error) return json(request, { success: false }, 400);
+    try { await notifyDemoRequests(client, id); } catch { /* The persisted queue retries independently. */ }
     return json(request, { success: true }, 201);
   } catch {
     return json(request, { success: false }, 400);

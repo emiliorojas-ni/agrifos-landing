@@ -108,8 +108,10 @@ un servidor Node en producción: las funciones se ejecutan en Supabase.
   el APK existente se enlaza desde GitHub y el panel indica que falta conectar
   el servicio. No hay usuarios, contraseñas ni datos de muestra embebidos.
 - Con Supabase configurado, las nuevas solicitudes se guardan en la base de
-  datos y se gestionan en el panel. No se envían además por FormSubmit ni se
-  importan las solicitudes que ya llegaron por correo.
+  datos y se gestionan en el panel. También se notifican por FormSubmit a
+  `agrifos.app@gmail.com`; al responder el correo se usa la dirección del
+  solicitante. Las notas internas no se envían. Los registros anteriores no
+  se notifican retroactivamente ni se importan correos recibidos.
 - Estados: Nueva, Contactada, Demo agendada, Completada y Archivada. Hay
   búsqueda, paginación de 25 solicitudes y notas internas. Archivar conserva
   la información; no elimina registros.
@@ -153,3 +155,40 @@ Esta prueba no envía correos ni usa un proyecto Supabase real.
 `tests/demo-rate-limits.sql` comprueba límites por IP, correo y global, además
 del rechazo de cambios a la cuota por usuarios del navegador. Se ejecuta después
 de las migraciones en la misma base desechable de las pruebas de permisos.
+
+## Notificaciones por correo
+
+Las migraciones `202610090003` y `202610090004` añaden una cola privada y un
+trabajo de Supabase Cron cada diez minutos. La solicitud y su trabajo de correo
+se guardan en la misma transacción. El primer envío ocurre al recibirla; si
+FormSubmit falla o requiere activación, se reintenta con intervalos crecientes
+de diez a sesenta minutos, hasta 48 intentos. La confirmación del formulario
+significa que la solicitud quedó guardada. «Enviado» en el panel significa
+que FormSubmit aceptó el mensaje; no confirma su llegada a la bandeja de entrada.
+Si el proveedor acepta el correo pero se pierde su respuesta, un reintento
+podría duplicar la notificación. El UUID de referencia permite identificarla.
+
+El destinatario debe activar FormSubmit mediante el correo «Activate Form».
+La activación de `agrifos.app@gmail.com` y el envío real se verificaron el
+9 de octubre de 2026. El servicio no requiere una clave API ni un plan de pago.
+
+Para reproducir la configuración del servidor:
+
+1. Aplica las migraciones 003 y 004 después de las iniciales.
+2. Genera `DEMO_NOTIFICATION_SECRET` aleatorio de 32 bytes; guárdalo únicamente
+   en los secretos Edge, usando `supabase/functions/.env` (ignorado por Git).
+3. En Supabase Vault crea `demo_notification_secret` con ese mismo valor y
+   `demo_notification_url` con la URL de la función `notify-demo` del proyecto.
+4. Despliega `submit-demo` y `notify-demo`, con `verify_jwt=false`. El worker
+   exige el secreto en `x-demo-notification-secret`; la función pública de
+   recepción conserva las validaciones, consentimiento y cuotas existentes.
+
+Nunca expongas el secreto del worker en variables `VITE_*`. Los usuarios del
+navegador no pueden reclamar trabajos ni modificar el estado del correo.
+Para reactivar un trabajo agotado, un operador del servidor puede restablecer
+`attempts=0,next_attempt_at=now()` en `private.demo_email_jobs` para su UUID.
+
+`tests/demo-notifications.sql` comprueba permisos, bloqueo de trabajos,
+reintentos y cierre tras el envío en la base desechable, después de la migración
+003. Las pruebas Edge comprueban destinatario fijo, dirección de respuesta,
+exclusión de notas, fallos del proveedor y reintentos sin duplicar solicitudes.

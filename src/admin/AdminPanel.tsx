@@ -473,6 +473,7 @@ export default function AdminPanel() {
                             <th>Interés</th>
                             <th>Estado</th>
                             <th>Recibida</th>
+                            <th>Correo</th>
                             <th>Gestión</th>
                           </tr>
                         </thead>
@@ -490,6 +491,7 @@ export default function AdminPanel() {
                                 </span>
                               </td>
                               <td>{date(request.created_at)}</td>
+                              <td>{({ sent: "Enviado", pending: "En cola", activation_required: "Activar FormSubmit", failed: "Pendiente de reintento", not_requested: "Sin notificación" })[request.notification_status || "not_requested"]}</td>
                               <td>
                                 <button
                                   type="button"

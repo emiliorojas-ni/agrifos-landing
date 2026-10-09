@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.download-installer]
 verify_jwt = false
+
+[functions.notify-demo]
+verify_jwt = false

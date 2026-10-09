@@ -10,6 +10,8 @@ export default function DemoRequest() {
   const [status, setStatus] =
     useState<"idle" | "sending" | "success" | "error">("idle")
   const inFlight = useRef(false)
+  const submissionId = useRef<string | null>(null)
+  const submissionFields = useRef("")
   const confirmation = useRef<HTMLDivElement>(null)
   const [verification, setVerification] = useState("")
   const [verificationKey, setVerificationKey] = useState(0)
@@ -35,12 +37,18 @@ export default function DemoRequest() {
 
     try {
       if (supabase) {
+        const fingerprint = JSON.stringify(Array.from(data.entries()))
+        if (fingerprint !== submissionFields.current) {
+          submissionId.current = crypto.randomUUID()
+          submissionFields.current = fingerprint
+        }
         if (turnstileSiteKey && !verification)
           throw new Error("Verification required")
         const { data: result, error } = await supabase.functions.invoke(
           "submit-demo",
           {
             body: {
+              submission_id: submissionId.current,
               name: String(data.get("name")).trim(),
               email: String(data.get("email")).trim(),
               organization: String(data.get("organization") || "").trim(),
@@ -76,7 +84,9 @@ export default function DemoRequest() {
             "Autorización de contacto":
               "Sí, para coordinar una demostración de Ágrifos",
             _subject: "Ágrifos — Nueva solicitud de demo",
+            _replyto: String(data.get("email")).trim(),
             _template: "table",
+            _captcha: "false",
             _honey: "",
           }),
         })
@@ -93,6 +103,8 @@ export default function DemoRequest() {
         }
       }
       form.reset()
+      submissionId.current = null
+      submissionFields.current = ""
       setStatus("success")
       // Focus the confirmation after React has committed the new view.
       window.requestAnimationFrame(() => confirmation.current?.focus())
@@ -324,7 +336,7 @@ export default function DemoRequest() {
               <p className="demo-form-note">
                 Usaremos estos datos para responder a tu solicitud.{" "}
                 {supabase ? (
-                  "Tu solicitud será gestionada por el equipo de Ágrifos."
+                  <>Tu solicitud se guarda en Ágrifos y se envía por correo mediante <a href="https://formsubmit.co/privacy.pdf" target="_blank" rel="noreferrer">FormSubmit</a>.</>
                 ) : (
                   <>
                     El envío se procesa mediante{" "}

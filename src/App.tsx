@@ -1,7 +1,7 @@
 import logotipo from "./assets/agrifos-logotipo.svg"
 import isotipo from "./assets/agrifos-isotipo.svg"
 import panelGeneral from "./assets/panel-general.png"
-import { useEffect, useState, type CSSProperties } from "react"
+import { useEffect, useRef, useState, type CSSProperties } from "react"
 
 const ArrowUpRight = ({ className = "" }: { className?: string }) => (
   <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
@@ -301,8 +301,48 @@ const StoriesCarousel = () => {
 }
 
 export default function App() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
+  const header = useRef<HTMLElement>(null)
+  const objectTrack = useRef<HTMLDivElement>(null)
   const [activeObject, setActiveObject] = useState(0)
   const [activeReading, setActiveReading] = useState(0)
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 901px)")
+    const closeOnResize = () => setMenuOpen(false)
+    desktop.addEventListener("change", closeOnResize)
+    return () => desktop.removeEventListener("change", closeOnResize)
+  }, [])
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false)
+        menuButton.current?.focus()
+      }
+    }
+    const closeOutside = (event: PointerEvent) => {
+      if (!header.current?.contains(event.target as Node)) setMenuOpen(false)
+    }
+    document.addEventListener("keydown", closeOnEscape)
+    document.addEventListener("pointerdown", closeOutside)
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape)
+      document.removeEventListener("pointerdown", closeOutside)
+    }
+  }, [menuOpen])
+
+  useEffect(() => {
+    const track = objectTrack.current
+    const card = track?.querySelector<HTMLElement>(".is-expanded")
+    if (!track || !card || !window.matchMedia("(max-width: 900px)").matches) return
+    track.scrollTo({
+      left: track.scrollLeft + card.getBoundingClientRect().left - track.getBoundingClientRect().left,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    })
+  }, [activeObject])
 
   useEffect(() => {
     const root = document.documentElement
@@ -351,14 +391,29 @@ export default function App() {
 
   return (
     <main id="inicio">
-      <header className="site-header">
+      <header className="site-header" ref={header}>
         <span className="scroll-progress" aria-hidden="true" />
         <div className="shell nav-shell">
           <Brand />
-          <nav aria-label="Navegación principal">
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="primary-navigation"
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            onClick={() => setMenuOpen((open) => !open)}
+            ref={menuButton}
+          >
+            <span>{menuOpen ? "Cerrar" : "Menú"}</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d={menuOpen ? "M6 6l12 12M6 18 18 6" : "M4 7h16M4 12h16M4 17h16"} />
+            </svg>
+          </button>
+          <nav id="primary-navigation" className={menuOpen ? "is-open" : ""} aria-label="Navegación principal" onClick={() => setMenuOpen(false)}>
             <a href="#proposito">Propósito</a>
             <a href="#pilares">Nuestros pilares</a>
             <a href="#historias">Historias</a>
+            <a className="mobile-contact" href="#contacto">Hablemos <ArrowUpRight /></a>
           </nav>
           <a className="button button--forest button--small" href="#contacto">
             Hablemos
@@ -515,7 +570,7 @@ export default function App() {
             </div>
           </div>
         </div>
-        <div className="shell field-objects" data-reveal="up">
+        <div className="shell field-objects" data-reveal="up" ref={objectTrack}>
           <article
             className={`object-card object-card--sensor ${
               activeObject === 0 ? "is-expanded" : ""

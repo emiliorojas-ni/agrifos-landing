@@ -1,0 +1,7 @@
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped

@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react"
 import type { Session } from "@supabase/supabase-js"
 import {
-  downloadUrl,
+  downloadInstaller,
   extensions,
   fileSize,
   platforms,
@@ -14,6 +14,8 @@ import {
 } from "../lib/supabase"
 import logo from "../assets/agrifos-logotipo.svg"
 import "./admin.css"
+import DemoAuthorization, { useAuthorizationClock } from "./DemoAuthorization"
+import { authorizationStatus } from "../lib/demo-authorization"
 
 function date(value: string) {
   return new Date(value).toLocaleString("es-NI", {
@@ -23,6 +25,7 @@ function date(value: string) {
 }
 
 export default function AdminPanel() {
+  const authorizationNow = useAuthorizationClock()
   const recoveryRequested = new URLSearchParams(window.location.search).get("recovery") === "1"
   const [session, setSession] = useState<Session | null>(null)
   const [checking, setChecking] = useState(true)
@@ -244,8 +247,13 @@ export default function AdminPanel() {
     }
   }
   async function preview(installer: Installer) {
-    if (installer.is_published || installer.source === "github") {
-      window.location.assign(downloadUrl(installer))
+    if (installer.is_published) {
+      try { await downloadInstaller(supabase!, installer.id) }
+      catch { setNotice("No pudimos preparar la descarga. Revisa tu sesión y que el APK esté alojado en el almacenamiento privado.") }
+      return
+    }
+    if (installer.source !== "storage") {
+      setNotice("Esta versión debe cargarse al almacenamiento privado antes de descargarla.")
       return
     }
     const { data, error } = await supabase!.storage
@@ -472,6 +480,7 @@ export default function AdminPanel() {
                             <th>Persona</th>
                             <th>Interés</th>
                             <th>Estado</th>
+                            <th>Autorización de demo</th>
                             <th>Recibida</th>
                             <th>Correo</th>
                             <th>Gestión</th>
@@ -489,6 +498,9 @@ export default function AdminPanel() {
                                 <span className="admin-badge">
                                   {requestStatuses[request.status]}
                                 </span>
+                              </td>
+                              <td className="admin-authorization-cell">
+                                <span className="admin-badge">{authorizationStatus(request.authorization, authorizationNow)}</span>
                               </td>
                               <td>{date(request.created_at)}</td>
                               <td>{({ sent: "Enviado", pending: "En cola", activation_required: "Activar FormSubmit", failed: "Pendiente de reintento", not_requested: "Sin notificación" })[request.notification_status || "not_requested"]}</td>
@@ -600,7 +612,8 @@ export default function AdminPanel() {
                                 <div className="admin-actions">
                                   <button
                                     type="button"
-                                    disabled={busy}
+                                    disabled={busy || installer.source !== "storage"}
+                                    title={installer.source !== "storage" ? "Carga el APK al almacenamiento privado para publicar esta versión." : undefined}
                                     onClick={() => publish(installer)}
                                   >
                                     {installer.is_published
@@ -648,8 +661,10 @@ function RequestDetails({
   const [notes, setNotes] = useState(request.notes)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
+  const [authorizationBusy, setAuthorizationBusy] = useState(false)
   async function save(event: FormEvent) {
     event.preventDefault()
+    if (saving || authorizationBusy) return
     setSaving(true)
     setError("")
     try {
@@ -660,7 +675,7 @@ function RequestDetails({
         .select()
         .single()
       if (result.error) throw result.error
-      onSave(result.data as DemoRecord)
+      onSave({ ...result.data, authorization: request.authorization } as DemoRecord)
     } catch {
       setError("No pudimos guardar los cambios. Intenta de nuevo.")
     } finally {
@@ -674,7 +689,7 @@ function RequestDetails({
     >
       <div className="admin-toolbar">
         <h2 id="request-detail-title">{request.name}</h2>
-        <button disabled={saving} type="button" onClick={onClose}>
+        <button disabled={saving || authorizationBusy} type="button" onClick={onClose}>
           Cerrar detalle
         </button>
       </div>
@@ -695,6 +710,8 @@ function RequestDetails({
         </dd>
       </dl>
       <form onSubmit={save}>
+        <fieldset disabled={saving || authorizationBusy}>
+          <legend className="admin-sr-only">Seguimiento de la solicitud</legend>
         <label>
           Estado
           <select
@@ -725,7 +742,14 @@ function RequestDetails({
         >
           {saving ? "Guardando…" : "Guardar cambios"}
         </button>
+        </fieldset>
       </form>
+      <DemoAuthorization
+        requestId={request.id}
+        disabled={saving}
+        onBusyChange={setAuthorizationBusy}
+        onChange={(authorization) => onSave({ ...request, authorization })}
+      />
     </section>
   )
 }

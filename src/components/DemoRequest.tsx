@@ -123,7 +123,7 @@ export default function DemoRequest() {
       <div className="shell demo-grid">
         <div className="demo-intro" data-reveal="up">
           <p className="section-number section-number--dark">
-            06 — Del dato a tu parcela
+            05 — Del dato a tu parcela
           </p>
           <h2 id="demo-title">
             Ve el campo con <em>otra mirada.</em>
@@ -143,7 +143,7 @@ export default function DemoRequest() {
             <li>
               <span>02</span>
               <div>
-                <strong>Coordinemos una demostración</strong>
+                <strong>Revisamos tu solicitud</strong>
                 <p>
                   Te contactaremos para encontrar un momento para conversar.
                 </p>
@@ -152,10 +152,10 @@ export default function DemoRequest() {
             <li>
               <span>03</span>
               <div>
-                <strong>Exploremos la solución</strong>
+                <strong>Recibe acceso a la app</strong>
                 <p>
-                  Lecturas del suelo, seguimiento del cultivo y conocimiento
-                  útil.
+                  Si tu demo es aprobada, recibirás por correo un enlace
+                  privado para descargar la aplicación.
                 </p>
               </div>
             </li>
@@ -180,8 +180,9 @@ export default function DemoRequest() {
               <p className="demo-card-eyebrow">El primer paso está dado</p>
               <h3>Gracias por acercarte al campo.</h3>
               <p>
-                Tu solicitud fue enviada. Te contactaremos al correo que nos
-                compartiste para coordinar la demostración.
+                Tu solicitud fue enviada. Revisaremos tus datos y te
+                contactaremos al correo que compartiste. Cuando tu demo sea
+                aprobada, recibirás un enlace privado para descargar la app.
               </p>
               <button
                 className="button button--forest"

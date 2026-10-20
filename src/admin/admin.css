@@ -58,6 +58,13 @@
 .admin-detail a { text-decoration: underline; }
 .admin-message { white-space: pre-wrap; }
 .admin-help { font-size: 12px; }
+.admin-authorization { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
+.admin-authorization h3 { color: var(--forest); font-size: 22px; }
+.admin-authorization h4 { margin-top: 28px; color: var(--forest); }
+.admin-authorization input { max-width: 360px; }
+.admin-authorization-history { padding-left: 24px; }
+.admin-authorization-history li { margin-block: 16px; line-height: 1.6; overflow-wrap: anywhere; }
+.admin-authorization-history span { display: block; font-size: 12px; }
 .admin-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 1000px) { .admin-content--auth { grid-template-columns: minmax(0,1fr); gap: 32px; padding-top: 48px; } .admin-content--auth .admin-intro { padding-top: 0; } .admin-content--auth h1 em { display: inline; } .admin-signature { display: none; } .admin-content--auth .admin-lead { max-width: 640px; margin-bottom: 0; } .admin-login, .admin-content--auth .admin-notice { max-width: 640px; } }
 @media (max-width: 640px) { .admin-header { align-items: start; } .admin-header img { width: 110px; } .admin-card { padding: 24px 20px; } .admin-content { padding-top: 32px; } .admin-content--auth h1 { font-size: clamp(36px,9vw,46px); } .admin-lead { font-size: 16px; } .admin-filters, .admin-upload-grid { grid-template-columns: 1fr; gap: 0; } .admin-detail dl { grid-template-columns: 1fr; gap: 8px; } .admin-detail dd { margin-bottom: 12px; } .admin-pagination { justify-content: start; } }

@@ -3,22 +3,24 @@ import ReactDOM from "react-dom/client"
 import App from "./App"
 import "./index.css"
 import "./responsive.css"
+import { pageRoute } from "./lib/routes"
 
 const AdminPanel = lazy(() => import("./admin/AdminPanel"))
+const DownloadPage = lazy(() => import("./components/DownloadPage"))
 function Root() {
-  const [admin, setAdmin] = useState(
-    window.location.hash === "#/admin" || new URLSearchParams(window.location.search).get("recovery") === "1",
+  const [page, setPage] = useState(
+    () => pageRoute(window.location.hash, window.location.search),
   )
   useEffect(() => {
     const onHash = () => {
-      const next = window.location.hash === "#/admin" || new URLSearchParams(window.location.search).get("recovery") === "1"
-      setAdmin(next)
-      if (next || admin) window.scrollTo(0, 0)
+      const next = pageRoute(window.location.hash, window.location.search)
+      setPage(next)
+      if (next !== page) window.scrollTo(0, 0)
     }
     window.addEventListener("hashchange", onHash)
     return () => window.removeEventListener("hashchange", onHash)
-  }, [admin])
-  return admin ? (
+  }, [page])
+  return page !== "landing" ? (
     <Suspense
       fallback={
         <p className="shell" role="status">
@@ -26,7 +28,7 @@ function Root() {
         </p>
       }
     >
-      <AdminPanel />
+      {page === "admin" ? <AdminPanel /> : <DownloadPage />}
     </Suspense>
   ) : (
     <App />

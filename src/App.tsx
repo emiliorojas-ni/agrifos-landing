@@ -3,7 +3,6 @@ import isotipo from "./assets/agrifos-isotipo.svg"
 import panelGeneral from "./assets/panel-general.png"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import DemoRequest from "./components/DemoRequest"
-import Downloads from "./components/Downloads"
 
 const ArrowUpRight = ({ className = "" }: { className?: string }) => (
   <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
@@ -445,11 +444,10 @@ export default function App() {
               <span className="eyebrow-line" />
             </div>
             <h1 id="hero-title">
-              Transformamos los datos agrícolas en <em>conocimiento útil.</em>
+              Transformamos los datos agrícolas en <em>decisiones exactas y ahorro inteligente.</em>
             </h1>
             <p>
-              Somos el puente entre la experiencia que nace de la tierra y la
-              tecnología que permite verla con mayor precisión.
+              Somos el puente entre tu experiencia en la tierra y la tecnología de precisión. Te acompañamos para que dejes de cultivar a ciegas y optimices cada córdoba de tu inversión.
             </p>
             <div className="hero-actions">
               <a className="button button--ochre" href="#demo">
@@ -528,9 +526,7 @@ export default function App() {
               agricultura regenerativa.
             </p>
             <p>
-              Integramos datos, observación y experiencia local para que cada
-              decisión productiva también contribuya a la salud del suelo, la
-              eficiencia de los recursos y la resiliencia de los territorios.
+              Brindamos asistencia agrícola digital a pequeños y medianos productores mediante la transformación de datos provenientes de sensores genéricos y análisis de laboratorio en recomendaciones precisas que contribuyan a optimizar la gestión agrícola.
             </p>
             <div className="purpose-facts">
               <div>
@@ -923,7 +919,6 @@ export default function App() {
         </div>
       </section>
 
-      <Downloads />
       <DemoRequest />
 
       <footer id="contacto">

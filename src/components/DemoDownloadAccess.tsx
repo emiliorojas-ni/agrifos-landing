@@ -39,9 +39,8 @@ export default function DemoDownloadAccess() {
           if (demoAccessRequested && !recoveryRequested) {
             const clean = new URL(window.location.href)
             clean.searchParams.delete("demo_access")
-            clean.hash = "descargas"
+            clean.hash = "/descargar"
             window.history.replaceState(null, "", clean.pathname + clean.search + clean.hash)
-            window.requestAnimationFrame(() => document.getElementById("descargas")?.scrollIntoView())
           }
         }
       }
@@ -123,7 +122,7 @@ export default function DemoDownloadAccess() {
   return (
     <div className="download-access" aria-busy={busy || checkingSession || (!!session && access === "checking")}>
       {checkingSession ? <p role="status">Comprobando sesión…</p> : !session ? <form onSubmit={signIn}>
-        <p>La descarga requiere una demo autorizada. Verifica el correo que usaste al solicitarla.</p>
+        <p>Abre el enlace que recibiste después de aprobarse tu demo. Si venció, puedes solicitar uno nuevo con el mismo correo.</p>
         <label htmlFor="demo-access-email">Correo electrónico</label>
         <input id="demo-access-email" type="email" autoComplete="email" required maxLength={254} value={email} disabled={busy} onChange={(event) => setEmail(event.target.value)} />
         <button className="button button--forest" disabled={busy || !email.trim()} type="submit">{busy ? "Enviando…" : "Recibir enlace de acceso"}</button>

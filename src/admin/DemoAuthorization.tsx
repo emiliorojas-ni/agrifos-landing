@@ -57,6 +57,24 @@ export default function DemoAuthorization({ requestId, disabled, onChange, onBus
     return () => { alive = false }
   }, [requestId, retry])
 
+  async function deliverAccess() {
+    const { data, error: failure } = await supabase!.functions.invoke("send-demo-access", {
+      body: { request_id: requestId },
+    })
+    if (failure || data?.success !== true) throw new Error("Access email not confirmed")
+  }
+
+  async function resendAccess() {
+    if (busy || disabled || loading || authorizationStatus(details?.authorization) !== "Autorizada") return
+    setBusy(true); onBusyChange(true); setError(""); setNotice("")
+    try {
+      await deliverAccess()
+      setNotice("Supabase aceptó el envío del enlace de acceso al correo de la solicitud. No confirma su llegada a la bandeja de entrada.")
+    } catch {
+      setError("La demo sigue autorizada, pero no pudimos confirmar el envío. Espera un minuto y usa Reenviar enlace de acceso.")
+    } finally { setBusy(false); onBusyChange(false) }
+  }
+
   async function change(action: "authorize" | "revoke") {
     if (busy || disabled || loading || !details) return
     setError("")
@@ -79,7 +97,14 @@ export default function DemoAuthorization({ requestId, disabled, onChange, onBus
       setDetails(updated)
       onChange(updated.authorization)
       setExpiry("")
-      setNotice(action === "authorize" ? "Demo autorizada." : "Autorización revocada.")
+      if (action === "authorize") {
+        try {
+          await deliverAccess()
+          setNotice("Demo autorizada. Supabase aceptó el envío del enlace de acceso al correo de la solicitud; revisa también spam.")
+        } catch {
+          setError("La demo quedó autorizada, pero no pudimos confirmar el envío del correo. Usa Reenviar enlace de acceso para reintentarlo.")
+        }
+      } else setNotice("Autorización revocada.")
     } catch {
       // Reload before allowing another change: a lost response may have committed.
       setDetails(null)
@@ -119,9 +144,11 @@ export default function DemoAuthorization({ requestId, disabled, onChange, onBus
               Hora local de tu dispositivo ({Intl.DateTimeFormat().resolvedOptions().timeZone}). Vacío significa sin vencimiento.
               {authorization && " Al volver a autorizar se reemplaza el vencimiento anterior y se conserva el historial."}
             </p>
+            <p className="admin-help">Al autorizar, se envía al correo de esta solicitud un enlace para abrir la pantalla privada de descarga.</p>
             <div className="admin-actions">
               <button type="submit" className="button button--forest">{busy ? "Guardando…" : "Autorizar demo"}</button>
               {authorization && !authorization.revoked_at && <button type="button" onClick={() => void change("revoke")}>Revocar autorización</button>}
+              {authorizationStatus(authorization, now) === "Autorizada" && <button type="button" onClick={() => void resendAccess()}>Reenviar enlace de acceso</button>}
             </div>
           </fieldset>
         </form>

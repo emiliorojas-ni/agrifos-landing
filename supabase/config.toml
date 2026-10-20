@@ -9,3 +9,7 @@ verify_jwt = false
 
 [functions.notify-demo]
 verify_jwt = false
+
+[functions.send-demo-access]
+# The handler validates the JWT with Auth and requires administrator permission.
+verify_jwt = false

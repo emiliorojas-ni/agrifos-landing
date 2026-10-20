@@ -129,8 +129,7 @@ export default function DemoRequest() {
             Ve el campo con <em>otra mirada.</em>
           </h2>
           <p className="demo-lead">
-            Conoce Ágrifos en una demostración y descubre cómo conectar las
-            señales de tu cultivo con decisiones más precisas.
+            Conoce Ágrifos en una demostración y descubre cómo conectar los parámetros de tu suelo con decisiones más precisas.
           </p>
           <ol className="demo-steps">
             <li>

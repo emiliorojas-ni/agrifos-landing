@@ -775,8 +775,7 @@ export default function App() {
             </h2>
             <div className="territory-copy">
               <p>
-                Observamos patrones que no siempre son visibles y los
-                convertimos en acciones concretas, comprensibles y medibles.
+                Analizamos datos complejos y los convertimos en conocimiento útil, recomendaciones concretas y acompañamiento integral en la gestión de tu cultivo.
               </p>
               <div
                 className="territory-metrics"
@@ -939,15 +938,25 @@ export default function App() {
               <p className="footer-label">Encontremos una mejor dirección</p>
               <a href="mailto:agrifos.app@gmail.com">agrifos.app@gmail.com</a>
               <p>León, Nicaragua</p>
+              <a
+                className="footer-instagram"
+                href="https://www.instagram.com/agrifos.ni?dlrf=MWNqdHMwNmtnd3Mwcw=="
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ágrifos en Instagram (abre en una nueva pestaña)"
+              >
+                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.7" />
+                  <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.7" />
+                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+                </svg>
+                <span>@agrifos.ni</span>
+                <ArrowUpRight />
+              </a>
             </div>
           </div>
           <div className="footer-bottom">
             <p>© 2026 Ágrifos. Todos los derechos reservados.</p>
-            <div>
-              <a href="#linkedin">LinkedIn</a>
-              <a href="#instagram">Instagram</a>
-              <a href="#/admin">Acceso privado</a>
-            </div>
             <a href="#inicio">Volver arriba ↑</a>
           </div>
         </div>

@@ -217,8 +217,9 @@ const StoriesCarousel = () => {
             <h2 id="stories-title">Datos que se convierten en acción.</h2>
           </div>
           <p>
-            Un recorrido por las señales que observamos y las decisiones que
-            ayudamos a construir.
+            Convertimos tus datos en decisiones para hacer crecer tu cultivo. <br /><br />
+
+            Datos + tecnología + conocimiento agrícola + recomendaciones + asistencia técnica.
           </p>
         </div>
 
@@ -501,7 +502,7 @@ export default function App() {
           <div className="purpose-intro" data-reveal="left">
             <p className="section-number">01 — Nuestro ADN</p>
             <h2 id="purpose-title">
-              Cultivamos decisiones que respetan el origen y mejoran el futuro.
+              Datos que hacen crecer.
             </h2>
             <figure className="purpose-image">
               <img
@@ -522,8 +523,7 @@ export default function App() {
           </div>
           <div className="purpose-content" data-reveal="right">
             <p className="purpose-lead">
-              Nuestra misión es facilitar decisiones precisas y promover una
-              agricultura regenerativa.
+              Ágrifos transforma los datos del campo en conocimiento para convertir mejores decisiones en crecimiento agrícola.
             </p>
             <p>
               Brindamos asistencia agrícola digital a pequeños y medianos productores mediante la transformación de datos provenientes de sensores genéricos y análisis de laboratorio en recomendaciones precisas que contribuyan a optimizar la gestión agrícola.
@@ -744,17 +744,17 @@ export default function App() {
             <div className="object-copy">
               <span>04 / Resultado</span>
               <div className="object-title">
-                <strong>Calidad medible</strong>
+                <strong>Crecimiento medible</strong>
                 <button
                   aria-expanded={activeObject === 3}
-                  aria-label="Ver más sobre calidad medible"
+                  aria-label="Ver más sobre crecimiento medible"
                   onClick={() => setActiveObject(activeObject === 3 ? -1 : 3)}
                   type="button"
                 >
                   <i />
                 </button>
               </div>
-              <small>Del territorio al grano</small>
+              <small>La certeza agronómica reflejada en cada cosecha.</small>
               <p className="object-detail">
                 Convertimos el seguimiento de la parcela en trazabilidad,
                 consistencia y evidencia para mejorar cada cosecha.
@@ -932,8 +932,8 @@ export default function App() {
           </div>
           <div className="footer-main" data-reveal="up">
             <h2>
-              Conocimiento que
-              <br /> vuelve a la tierra.
+              Modernizando el
+              <br /> agro nicaragüense.
             </h2>
             <div className="footer-contact">
               <p className="footer-label">Encontremos una mejor dirección</p>
@@ -942,7 +942,7 @@ export default function App() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>© 2025 Ágrifos. Todos los derechos reservados.</p>
+            <p>© 2026 Ágrifos. Todos los derechos reservados.</p>
             <div>
               <a href="#linkedin">LinkedIn</a>
               <a href="#instagram">Instagram</a>

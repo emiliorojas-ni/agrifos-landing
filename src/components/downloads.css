@@ -15,6 +15,17 @@
 .download-card .button { width: 100%; min-height: 52px; gap: 20px; }
 .download-note { margin: 20px 0 0; color: #666d61; font-size: 11px; line-height: 1.8; }
 .download-note a { display: inline-block; margin-top: 8px; color: var(--forest); text-decoration: underline; text-underline-offset: 4px; }
+.download-access { margin-top: 24px; font-size: 14px; line-height: 1.7; }
+.download-access p { margin-block: 16px; }
+.download-access label { display: block; color: var(--forest); font-weight: 700; }
+.download-access input { display: block; width: 100%; min-height: 48px; margin-block: 8px 20px; padding: 12px; border: 1px solid var(--line); border-radius: 4px; background: #fffaf6; color: var(--charcoal); font: inherit; }
+.download-access a { display: inline-block; margin-top: 16px; text-decoration: underline; text-underline-offset: 4px; }
+.download-access button { cursor: pointer; font: inherit; }
+.download-access button:disabled { opacity: .6; cursor: not-allowed; }
+.download-access :is(button,input):focus-visible { outline: 2px solid var(--ochre); outline-offset: 4px; }
+.download-identity { overflow-wrap: anywhere; }
+.download-access-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.download-access-actions button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); background: transparent; color: var(--forest); }
 .downloads a:focus-visible { outline: 2px solid var(--ochre); outline-offset: 4px; }
 .download-visual { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 32px; min-width: 0; margin: 0; padding: 32px; border-radius: 3px 80px 3px 3px; background: var(--forest); color: var(--linen); }
 .download-visual::before, .download-visual::after { position: absolute; z-index: -1; content: ""; width: 540px; height: 540px; border: 1px solid rgba(249,240,233,.13); border-radius: 50%; }

@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react"
 import type { Session } from "@supabase/supabase-js"
 import {
-  downloadUrl,
+  downloadInstaller,
   extensions,
   fileSize,
   platforms,
@@ -247,8 +247,13 @@ export default function AdminPanel() {
     }
   }
   async function preview(installer: Installer) {
-    if (installer.is_published || installer.source === "github") {
-      window.location.assign(downloadUrl(installer))
+    if (installer.is_published) {
+      try { await downloadInstaller(supabase!, installer.id) }
+      catch { setNotice("No pudimos preparar la descarga. Revisa tu sesión y que el APK esté alojado en el almacenamiento privado.") }
+      return
+    }
+    if (installer.source !== "storage") {
+      setNotice("Esta versión debe cargarse al almacenamiento privado antes de descargarla.")
       return
     }
     const { data, error } = await supabase!.storage
@@ -607,7 +612,8 @@ export default function AdminPanel() {
                                 <div className="admin-actions">
                                   <button
                                     type="button"
-                                    disabled={busy}
+                                    disabled={busy || installer.source !== "storage"}
+                                    title={installer.source !== "storage" ? "Carga el APK al almacenamiento privado para publicar esta versión." : undefined}
                                     onClick={() => publish(installer)}
                                   >
                                     {installer.is_published

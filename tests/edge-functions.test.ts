@@ -4,7 +4,7 @@ import { handleRequest as download } from "../supabase/functions/download-instal
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
 }
-Deno.test("Intake validation and published downloads", async () => {
+Deno.test("Intake validation and authenticated demo downloads", async () => {
   const original = globalThis.fetch;
   const environment = {
     ALLOWED_ORIGINS: "https://agrifos.app",
@@ -21,6 +21,8 @@ Deno.test("Intake validation and published downloads", async () => {
   }
   let saved = 0, challenge = "valid", published = false, quota = true;
   let mailMode = "sent", mailed = 0;
+  let permitted = false, validUser = true, permissionFailure = false, storageFailure = false;
+  let installerSource = "storage", signed = 0;
   const records = new Map<string, Record<string, unknown>>();
   const outcomes: string[] = [];
   globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -29,6 +31,15 @@ Deno.test("Intake validation and published downloads", async () => {
       : input instanceof URL
       ? input.href
       : input.url;
+    if (url.includes("/auth/v1/user")) {
+      assert(new Headers(init?.headers).get("Authorization") === "Bearer test-user-token", "User token not validated with Auth");
+      return validUser ? Response.json({ id: "22222222-2222-4222-8222-222222222222", email: "person@example.com" })
+        : Response.json({ message: "Invalid session" }, { status: 401 });
+    }
+    if (url.includes("/rest/v1/rpc/can_download_demo")) {
+      assert(new Headers(init?.headers).get("Authorization") === "Bearer test-user-token", "Permission checked as service_role instead of user");
+      return permissionFailure ? Response.json({ message: "Unavailable" }, { status: 503 }) : Response.json(permitted);
+    }
     if (url.includes("challenges.cloudflare.com")) {
       return new Response(
         JSON.stringify({
@@ -84,7 +95,7 @@ Deno.test("Intake validation and published downloads", async () => {
         JSON.stringify(
           published
             ? [{
-              source: "storage",
+              source: installerSource,
               storage_path: "android/test/test.apk",
               file_name: "test.apk",
               external_url: null,
@@ -95,6 +106,9 @@ Deno.test("Intake validation and published downloads", async () => {
       );
     }
     if (url.includes("/storage/v1/object/sign/")) {
+      signed++;
+      assert(JSON.parse(String(init?.body)).expiresIn === 60, "Wrong signed URL lifetime");
+      if (storageFailure) return Response.json({ message: "Unavailable" }, { status: 503 });
       return new Response(
         JSON.stringify({
           signedURL:
@@ -184,17 +198,43 @@ Deno.test("Intake validation and published downloads", async () => {
     );
     const url =
       "https://test.supabase.co/functions/v1/download-installer?id=33333333-3333-4333-8333-333333333333";
-    assert(
-      (await download(new Request(url))).status === 404,
-      "Draft download allowed",
-    );
+    const downloadRequest = (token = "test-user-token", body: unknown = { id: "33333333-3333-4333-8333-333333333333" }, origin = "https://agrifos.app") => new Request(url, {
+      method: "POST", headers: { Origin: origin, "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify(body),
+    });
+    assert((await download(new Request(url))).status === 405, "Legacy public GET remains available");
+    assert((await download(downloadRequest(""))).status === 401, "Anonymous download allowed");
+    validUser = false;
+    assert((await download(downloadRequest())).status === 401, "Invalid user allowed");
+    validUser = true;
     published = true;
-    const response = await download(new Request(url));
+    assert((await download(downloadRequest())).status === 403 && signed === 0, "Unapproved/revoked/expired user received URL");
+    permitted = true;
+    permissionFailure = true;
+    assert((await download(downloadRequest())).status === 503 && signed === 0, "Permission error did not fail closed");
+    permissionFailure = false;
+    assert((await download(downloadRequest("test-user-token", { id: "bad" }))).status === 404, "Invalid installer accepted");
+    assert((await download(downloadRequest("test-user-token", { id: "x".repeat(2000) }))).status === 400, "Oversized download body accepted");
+    assert((await download(downloadRequest("test-user-token", undefined, "https://other.example"))).status === 403, "Unknown origin accepted");
+    published = false;
+    assert((await download(downloadRequest())).status === 404 && signed === 0, "Draft download allowed");
+    published = true;
+    installerSource = "github";
+    assert((await download(downloadRequest())).status === 404 && signed === 0, "External download bypass remains available");
+    installerSource = "storage";
+    storageFailure = true;
+    assert((await download(downloadRequest())).status === 503, "Storage failure reported as success");
+    storageFailure = false;
+    const response = await download(downloadRequest());
+    const result = await response.json();
     assert(
-      response.status === 302 &&
-        response.headers.get("Location")?.includes("token=test-only"),
-      "Published signed download failed",
+      response.status === 200 && result.url.includes("token=test-only") && result.expires_in === 60 &&
+        response.headers.get("Cache-Control") === "no-store" && response.headers.get("Access-Control-Allow-Origin") === "https://agrifos.app",
+      "Authorized published signed download failed",
     );
+    const beforeRevoked = signed;
+    permitted = false;
+    assert((await download(downloadRequest())).status === 403 && signed === beforeRevoked, "Revocation after a successful download was ignored");
   } finally {
     globalThis.fetch = original;
     for (const key of Object.keys(environment)) {

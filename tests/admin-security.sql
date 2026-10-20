@@ -6,7 +6,7 @@ set role anon;
 do $$ begin
   begin perform count(*) from public.demo_requests; raise exception 'Anonymous request read allowed'; exception when insufficient_privilege then null; end;
   begin perform public.is_admin(); raise exception 'Anonymous admin check allowed'; exception when insufficient_privilege then null; end;
-  if (select count(*) from public.installers) <> 1 then raise exception 'Published APK missing'; end if;
+  if (select count(*) from public.installers) <> 0 then raise exception 'Anonymous installer metadata leaked'; end if;
   if (select count(*) from storage.objects) <> 0 then raise exception 'Anonymous storage read allowed'; end if;
 end $$;
 reset role;
@@ -40,7 +40,7 @@ reset role;
 
 set role anon;
 do $$ begin
-  if (select count(*) from public.installers) <> 1 then raise exception 'Draft metadata leaked'; end if;
+  if (select count(*) from public.installers) <> 0 then raise exception 'Installer metadata leaked'; end if;
   if (select count(*) from storage.objects) <> 0 then raise exception 'Draft file leaked'; end if;
 end $$;
 reset role;
@@ -55,7 +55,7 @@ end $$;
 reset role;
 set role anon;
 do $$ begin
-  if (select version from public.installers limit 1) <> '1.1.0' then raise exception 'Public download not updated'; end if;
+  if (select count(*) from public.installers) <> 0 then raise exception 'Installer metadata became public'; end if;
   if (select count(*) from storage.objects) <> 0 then raise exception 'Storage objects became publicly readable'; end if;
 end $$;
 reset role;

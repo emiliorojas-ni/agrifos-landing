@@ -1,38 +1,8 @@
-import { useEffect, useState } from "react"
-import {
-  downloadUrl,
-  fileSize,
-  initialAndroid,
-  supabase,
-  type Installer,
-} from "../lib/supabase"
+import DemoDownloadAccess from "./DemoDownloadAccess"
 import "./downloads.css"
 import finanzas from "../assets/finanzas.jpeg"
 
 export default function Downloads() {
-  const [installers, setInstallers] = useState<Installer[]>(
-    supabase ? [] : [initialAndroid],
-  )
-  const [loading, setLoading] = useState(!!supabase)
-  const [failed, setFailed] = useState(false)
-  useEffect(() => {
-    if (!supabase) return
-    let cancelled = false
-    supabase
-      .from("installers")
-      .select("*")
-      .eq("is_published", true)
-      .then(({ data, error }) => {
-        if (cancelled) return
-        setFailed(!!error)
-        setInstallers(error ? [] : data as Installer[])
-        setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-  const installer = installers.find((item) => item.platform === "android")
   return (
     <section
       className="downloads"
@@ -51,11 +21,6 @@ export default function Downloads() {
             inteligencia al campo.
           </p>
         </div>
-        {failed && (
-          <p role="alert">
-            No pudimos consultar las versiones. Intenta recargar la página.
-          </p>
-        )}
               <article className="download-card">
                 <div className="download-card-heading">
                   <div>
@@ -64,25 +29,7 @@ export default function Downloads() {
                   </div>
                   <span className="download-format">APK <span aria-hidden="true">↓</span></span>
                 </div>
-                <p className="download-version">
-                  {installer
-                    ? `v${installer.version} · ${installer.architecture} · ${fileSize(installer.size_bytes)}`
-                    : loading
-                      ? "Consultando versiones…"
-                      : "Sin versión publicada por el momento."}
-                </p>
-                {installer && (
-                  <a
-                    className="button button--forest"
-                    href={downloadUrl(installer)}
-                    rel="noreferrer"
-                  >
-                    Descargar para Android
-                    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-                      <path d="M12 4v13m-5-5 5 5 5-5M5 20h14" stroke="currentColor" strokeWidth="1.6" />
-                    </svg>
-                  </a>
-                )}
+                <DemoDownloadAccess />
               </article>
         <p className="download-note">
           Instala únicamente versiones compatibles con tu dispositivo.

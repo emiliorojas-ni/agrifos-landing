@@ -1,9 +1,10 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import type { DemoAuthorization } from "./demo-authorization"
 
 const url = import.meta.env.VITE_SUPABASE_URL?.trim()
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim()
 export const recoveryRequested = new URLSearchParams(window.location.search).get("recovery") === "1"
+export const demoAccessRequested = new URLSearchParams(window.location.search).get("demo_access") === "1"
 export const turnstileSiteKey =
   import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() || ""
 export const supabase =
@@ -17,7 +18,18 @@ export const supabase =
         },
       })
     : null
-export const functionsUrl = url ? `${url.replace(/\/$/, "")}/functions/v1` : ""
+// Visitor access must not replace the administrator's session in the same tab.
+export const demoSupabase = url && key
+  ? createClient(url, key, {
+      auth: {
+        storage: window.sessionStorage,
+        storageKey: "agrifos-demo-access",
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: demoAccessRequested && !recoveryRequested,
+      },
+    })
+  : null
 
 export const platforms = {
   android: "Android",
@@ -61,23 +73,16 @@ export interface Installer {
   is_published: boolean
   created_at: string
 }
-export const initialAndroid: Installer = {
-  id: "00000000-0000-4000-8000-000000000001",
-  platform: "android",
-  version: "1.0.0",
-  architecture: "ARM64",
-  file_name: "agrifos-v1.0.0-android-arm64.apk",
-  size_bytes: 22600581,
-  storage_path: "android/00000000-0000-4000-8000-000000000001/agrifos-v1.0.0-android-arm64.apk",
-  source: "storage",
-  is_published: true,
-  created_at: "",
-  external_url: null,
-}
-export function downloadUrl(installer: Installer) {
-  return installer.source === "github"
-    ? installer.external_url!
-    : `${functionsUrl || "https://nquoibsuhgbomlbsljvs.supabase.co/functions/v1"}/download-installer?id=${installer.id}`
+export async function downloadInstaller(client: SupabaseClient, installerId: string) {
+  const { data, error } = await client.functions.invoke("download-installer", {
+    body: { id: installerId },
+  })
+  if (error || typeof data?.url !== "string" || !url) throw new Error("Download unavailable")
+  const target = new URL(data.url)
+  if (target.origin !== new URL(url).origin ||
+      !target.pathname.startsWith("/storage/v1/object/sign/installers/"))
+    throw new Error("Invalid download destination")
+  window.location.assign(target.href)
 }
 export function fileSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`

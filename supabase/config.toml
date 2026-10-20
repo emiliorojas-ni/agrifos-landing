@@ -4,6 +4,7 @@ project_id = "agrifos-landing"
 verify_jwt = false
 
 [functions.download-installer]
+# JWT is validated with Auth inside the handler; preflight must remain public.
 verify_jwt = false
 
 [functions.notify-demo]
